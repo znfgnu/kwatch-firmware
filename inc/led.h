@@ -17,8 +17,8 @@
 #define LED_RED		0x4000
 #define LED_BLUE	0x8000
 
-void ledInit(void);
-void ledOn(uint32_t);
-void ledOff(uint32_t);
+void led_init(void);
+void led_on(uint32_t);
+void led_off(uint32_t);
 
 #endif /* LED_H_ */

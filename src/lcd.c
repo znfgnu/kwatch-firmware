@@ -6,21 +6,25 @@
  */
 
 #include "lcd.h"
+#include "lcd_font.h"
 #include "stm32f10x_i2c.h"
+
 
 // private functions
 void lcdI2CWrite(uint8_t);
 void lcdI2CStart(uint8_t);
 void lcdI2CStop();
 void lcdI2CInit();
+void lcdI2CUpdatePage(uint8_t, uint8_t*);
+void lcdI2CUpdateScreen(uint8_t*);
 
-void lcdInit() {
+uint8_t lcd_buffer[LCD_PAGES][LCD_WIDTH];
+
+void lcd_init() {
 	lcdI2CInit();
 
 	lcdI2CStart(LCD_I2C_ADDR);
-
-	// -- start copy-paste --
-	lcdI2CWrite(0x00);	// register
+	lcdI2CWrite(LCD_I2C_CMD_TOKEN);
 
 	lcdI2CWrite(0xAE); //display off
 	lcdI2CWrite(0x20); //Set Memory Addressing Mode
@@ -51,36 +55,39 @@ void lcdInit() {
 	lcdI2CWrite(0x14); //
 	lcdI2CWrite(0xAF); //--turn on SSD1306 panel
 
-
-
-	// -- draw sth --
-
-	lcdI2CWrite(0xB0 + 1);
+	lcdI2CWrite(0xB0);
 	lcdI2CWrite(0x00);
 	lcdI2CWrite(0x10);
-
-	lcdI2CStop();
-	lcdI2CStart(LCD_I2C_ADDR);
-	lcdI2CWrite(0x40);		// register (GDDRAM register?)
-
-	for(int i=0; i<LCD_WIDTH; i++) {
-		lcdI2CWrite(0xFF);
-	}
-
-	// -- end copy-paste --
-
 	lcdI2CStop();
 
+	lcdI2CUpdateScreen((uint8_t*)lcd_buffer);
 }
 
-void lcdScroll(uint8_t lines) {
+void lcd_scroll(uint8_t lines) {
 	lcdI2CStart(LCD_I2C_ADDR);
-	lcdI2CWrite(0x00);	// register
-
+	lcdI2CWrite(LCD_I2C_CMD_TOKEN);	// register
 	lcdI2CWrite(0xD3);
-
 	lcdI2CWrite(lines);	// register
 	lcdI2CStop();
+}
+
+void lcd_invert(uint8_t inverted) {
+	lcdI2CStart(LCD_I2C_ADDR);
+	lcdI2CWrite(LCD_I2C_CMD_TOKEN);
+	lcdI2CWrite(LCD_CMD_INVERTED(inverted));
+	lcdI2CStop();
+}
+
+void lcd_set_contrast(uint8_t contrast) {
+	lcdI2CStart(LCD_I2C_ADDR);
+	lcdI2CWrite(LCD_I2C_CMD_TOKEN);
+	lcdI2CWrite(0x81); //--set contrast control register
+	lcdI2CWrite(contrast);
+	lcdI2CStop();
+}
+
+void lcd_update() {
+	lcdI2CUpdateScreen((uint8_t*)lcd_buffer);
 }
 
 // --- begin private functions
@@ -103,11 +110,8 @@ void lcdI2CStart(uint8_t addr) {
 	while(!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_MODE_SELECT));
 
 	// stm is transmitter
-	I2C_Send7bitAddress(I2C1, addr, I2C_Direction_Transmitter);	// works when debugger stops here
-
-	while(!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));	// doesn't work when debugger stops here
-
-	I2C1->SR1;	// read value (what debugger does)
+	I2C_Send7bitAddress(I2C1, addr, I2C_Direction_Transmitter);
+	while(!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));
 }
 
 void lcdI2CStop() {
@@ -122,21 +126,14 @@ void lcdI2CInit() {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1, ENABLE);		// PB6-7 -> I2C1 pins pack 1
-//	RCC_AHB1PeriphClockCmd(RCC_AHB, ENABLE);
 
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_OD;			// alternate function (I2C here)
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-//	GPIO_InitStruct.GPIO_OType = GPIO_OType_OD;			// open drain - why?
-//	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 	RCC_APB1PeriphResetCmd(RCC_APB1Periph_I2C1, ENABLE);
 	RCC_APB1PeriphResetCmd(RCC_APB1Periph_I2C1, DISABLE);
-
-	// connects pins to alternate function
-//	GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_I2C1);
-//	GPIO_PinAFConfig(GPIOB, GPIO_PinSource11, GPIO_AF_I2C1);
 
 	I2C_InitStruct.I2C_ClockSpeed = 400000;
 	I2C_InitStruct.I2C_Mode = I2C_Mode_I2C;
@@ -147,4 +144,26 @@ void lcdI2CInit() {
 	I2C_Init(I2C1, &I2C_InitStruct);
 
 	I2C_Cmd(I2C1, ENABLE);
+}
+
+void lcdI2CUpdatePage(uint8_t page_number, uint8_t* buffer) {
+	lcdI2CStart(LCD_I2C_ADDR);
+	lcdI2CWrite(LCD_I2C_CMD_TOKEN);
+	lcdI2CWrite(0xB0 + page_number);
+	lcdI2CWrite(0x00);
+	lcdI2CWrite(0x10);
+	lcdI2CStop();
+
+	lcdI2CStart(LCD_I2C_ADDR);
+	lcdI2CWrite(LCD_I2C_DATA_TOKEN);		// register (GDDRAM register?)
+
+	for(int i=0; i<LCD_WIDTH; i++)
+		lcdI2CWrite(buffer[i]);
+
+	lcdI2CStop();
+}
+
+void lcdI2CUpdateScreen(uint8_t* buffer) {
+	for (int i=0; i<LCD_PAGES; ++i)
+		lcdI2CUpdatePage(i, buffer+LCD_WIDTH*i);
 }

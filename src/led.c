@@ -8,7 +8,7 @@
 #include "led.h"
 #include "stm32f10x_gpio.h"
 
-void ledInit() {
+void led_init() {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -21,10 +21,10 @@ void ledInit() {
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
-void ledOn(uint32_t led) {
+void led_on(uint32_t led) {
 	GPIO_ResetBits(GPIOA, led);
 }
 
-void ledOff(uint32_t led) {
+void led_off(uint32_t led) {
 	GPIO_SetBits(GPIOA, led);
 }
