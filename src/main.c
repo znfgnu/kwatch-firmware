@@ -15,6 +15,9 @@
 #include "led.h"
 #include "uart.h"
 #include "ui.h"
+#include "app_mgr.h"
+#include "app_events.h"
+#include "app__serial.h"
 
 void Delay(uint32_t count){
 	while(count--);
@@ -31,17 +34,15 @@ int main(void)
 	uart_open(USART1, 115200);
 	lcd_init();
 
+	app__serial_init();
+	app_wakeup(&app__serial);
+
 	for(int i=0; ;) {
-		lcd_set_contrast(((i>>1)&0x1F)<<3&0xFF);
+		uint8_t c = uart_getc(USART1);
+		(app__serial.handler)(APP_EVENT_BT_BYTE, (void*)c);
 
 		i++;
-		led_on(LED_GREEN);
-		lcd_update();
-		Delay(LITTLE_DELAY);
-
-		i++;
-		led_off(LED_GREEN);
-		lcd_update();
-		Delay(LITTLE_DELAY);
+		if (i&1) led_on(LED_GREEN);
+		else led_off(LED_GREEN);
 	}
 }

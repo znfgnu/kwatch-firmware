@@ -8,7 +8,12 @@
 #ifndef LCD_FONT_H_
 #define LCD_FONT_H_
 
-extern const uint8_t ASCII[255*5];
-#define LETTER(c, seg)	(ASCII[5*(c)+seg])
+#define LCD_FONT_DEFAULT_WIDTH			5
+#define LCD_FONT_DEFAULT_SPACING		1
+#define LCD_FONT_DEFAULT_WIDTH_TOTAL	LCD_FONT_DEFAULT_WIDTH+LCD_FONT_DEFAULT_SPACING
+extern const uint8_t lcd_font_default[255*5];
+
+
+#define LETTER(c, seg)	(lcd_font_default[LCD_FONT_DEFAULT_WIDTH*(c)+seg])
 
 #endif /* LCD_FONT_H_ */

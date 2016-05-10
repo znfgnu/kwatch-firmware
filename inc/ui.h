@@ -10,6 +10,9 @@
 
 #include <stdint.h>
 
+#define UI_APP_WIDTH	112
+#define UI_APP_HEIGHT	7		// in pages
+
 void ui_drawRectangles(uint8_t*);
 void ui_init();
 

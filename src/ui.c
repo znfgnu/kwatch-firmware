@@ -36,7 +36,7 @@ void ui_init() {
 	ui_print_text(lcd_buffer, 2, "12345678901234", 0);
 	ui_print_text(lcd_buffer, 3, "12345678901234", 0);
 	ui_print_text(lcd_buffer, 4, "12345678901234", 0);
-	ui_print_text(lcd_buffer, 5, "1234567890123456789", 0);
+	ui_print_text(lcd_buffer, 5, "123456789012345678", 0);
 	ui_print_text(lcd_buffer, 6, "12345678901234", 0);
 	ui_print_text(lcd_buffer, 7, "12345678901234", 0);
 }
