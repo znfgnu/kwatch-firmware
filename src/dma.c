@@ -7,7 +7,7 @@
 
 #include "dma.h"
 
-char* dmaBuffer = "ABCD";
+char* dmaBuffer = "Hello!";
 
 #define BUFSIZE 200
 char buffer[BUFSIZE];
@@ -51,6 +51,8 @@ void dma_init() {
 	dmaInitStruct.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
 	dmaInitStruct.DMA_Priority = DMA_Priority_VeryHigh;
 
+	for (int i=0; i<BUFSIZE; i++) buffer[i]=0xff;
+
 	DMA_DeInit(DMA1_Channel5);
 	DMA_Init(DMA1_Channel5, &dmaInitStruct);
 	DMA_Cmd(DMA1_Channel5, ENABLE);
@@ -62,9 +64,9 @@ void dma_init() {
 
 char getDMAchar() {
 	static char c;
-	while(!(*next));
+	while((*next)==0xff);
 	c = *next;
-	*next = 0x00;
+	*next = 0xff;
 	next++;
 	if (next == buffer+BUFSIZE) next=buffer;
 	return c;

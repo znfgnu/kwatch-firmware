@@ -59,12 +59,14 @@ static void serial_handle_char(uint8_t c) {
 	switch(c){
 	case '\r':
 		col = 0;	// carriage return
-		/* no break */
+		break;
 	case '\n':
 		serial_new_line();
 		break;
 	case 0x7F:		// backspace
 		serial_remove_last_char();
+		break;
+	case '\0':
 		break;
 	default:
 		serial_print_char(c);
