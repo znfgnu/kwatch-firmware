@@ -11,8 +11,10 @@
 #define LED_H_
 
 #include <stdint.h>
+#include "stm32f10x_gpio.h"
 
 #define LED_GREEN	GPIO_Pin_1
+#define LED_VIBR	GPIO_Pin_2
 #define LED_ORANGE	0x2000
 #define LED_RED		0x4000
 #define LED_BLUE	0x8000

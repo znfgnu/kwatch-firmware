@@ -10,6 +10,8 @@
 
 #define APP_EVENT_BT_BYTE			0x01		// received one byte via bluetooth
 
+#define APP_EVENT_DRAW				0x10
+
 #define APP_EVENT_BTN_UP_PRESSED	0x20
 #define APP_EVENT_BTN_UP_RELEASED	0x21
 #define APP_EVENT_BTN_UP_HOLD		0x22

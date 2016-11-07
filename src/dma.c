@@ -9,7 +9,7 @@
 
 char* dmaBuffer = "Hello!";
 
-#define BUFSIZE 200
+#define BUFSIZE 300
 char buffer[BUFSIZE];
 char* next=buffer;
 

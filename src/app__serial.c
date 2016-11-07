@@ -8,6 +8,7 @@
 #include "app__serial.h"
 #include "app_events.h"
 #include "lcd_font.h"
+#include "lcd.h"
 
 // Application structure
 App app__serial;
@@ -19,14 +20,16 @@ static const uint8_t total_lines = 7;
 static uint8_t line = 0;
 static uint8_t col = 0;
 
+static char textdata[18][7];	// I wasn't able to use constants
+
 static void serial_new_line() {
 	if (line == total_lines-1) {
 		// 1. Copy each line to the upper one
-		for (int i=0; i<UI_APP_HEIGHT-1; i++)
-			for (int j=0; j<UI_APP_WIDTH; j++)
-				app->framebuffer[i][j] = app->framebuffer[i+1][j];
+		for (int i=0; i<total_lines-1; i++)
+			for (int j=0; j<total_cols; j++)
+				textdata[i][j] = textdata[i+1][j];
 		// 2. Clear last line
-		for (int j=0; j<UI_APP_WIDTH; j++) app->framebuffer[UI_APP_HEIGHT-1][j]=0x00;
+		for (int j=0; j<total_cols; j++) textdata[total_lines-1][j]=0x00;
 	}
 	else line++;
 }
@@ -34,11 +37,8 @@ static void serial_new_line() {
 static void serial_print_char(uint8_t c) {
 
 	// 1. Draw character in right place
-	int i;
-	for (i=0; i<LCD_FONT_DEFAULT_WIDTH; i++)
-		app->framebuffer[line][col*(LCD_FONT_DEFAULT_WIDTH_TOTAL)+i] = lcd_font_default[LCD_FONT_DEFAULT_WIDTH*c+i];
-	for (; i<LCD_FONT_DEFAULT_WIDTH_TOTAL; i++)
-		app->framebuffer[line][col*(LCD_FONT_DEFAULT_WIDTH_TOTAL)+i] = 0x00;
+	textdata[line][col] = c;
+
 
 	col++;
 	if (col == total_cols) {
@@ -74,12 +74,45 @@ static void serial_handle_char(uint8_t c) {
 	}
 }
 
+#define BUF(x,y) drawbuf[LCD_WIDTH*x+y]
+static void serial_draw(uint8_t* drawbuf) {
+	// draw rectangles
+	for (int i=0; i<111; ++i) drawbuf[i]=0xFF;
+
+	for (int i=0; i<LCD_PAGES; ++i)
+		for (int j=112; j<LCD_WIDTH; ++j)
+			drawbuf[i*LCD_WIDTH+j] = 0xFF;
+
+	// draw content
+	int textline = 0;
+	int textcol = 0;
+	int lcdline = 1;
+	int lcdcol = 0;
+	for (;textline<total_lines; textline++, lcdline++) {
+		for (textcol = 0, lcdcol=0; textcol<total_cols; textcol++) {
+
+			int k;
+			char c = textdata[textline][textcol];
+			for (k=0; k<LCD_FONT_DEFAULT_WIDTH; k++)
+				BUF(lcdline, lcdcol++) = lcd_font_default[LCD_FONT_DEFAULT_WIDTH*c+k];
+			for (; k<LCD_FONT_DEFAULT_WIDTH_TOTAL; k++)
+				BUF(lcdline, lcdcol++) = 0x00;
+
+		}
+	}
+
+
+
+
+}
+
 void serialhandler(APP_ARGS) {
 	switch(id) {
 	case APP_EVENT_BT_BYTE:
 		serial_handle_char((uint8_t)data);
-		app_updatescreen(app);
 		break;
+	case APP_EVENT_DRAW:
+		serial_draw((uint8_t*)data);
 	}
 }
 
