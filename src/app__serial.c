@@ -20,7 +20,7 @@ static const uint8_t total_lines = 7;
 static uint8_t line = 0;
 static uint8_t col = 0;
 
-static char textdata[18][7];	// I wasn't able to use constants
+static char textdata[7][18];	// I wasn't able to use constants
 
 static void serial_new_line() {
 	if (line == total_lines-1) {
@@ -89,7 +89,9 @@ static void serial_draw(uint8_t* drawbuf) {
 	int lcdline = 1;
 	int lcdcol = 0;
 	for (;textline<total_lines; textline++, lcdline++) {
-		for (textcol = 0, lcdcol=0; textcol<total_cols; textcol++) {
+		textcol = 0;
+		lcdcol=0;
+		for (; textcol<total_cols; textcol++) {
 
 			int k;
 			char c = textdata[textline][textcol];
@@ -113,6 +115,7 @@ void serialhandler(APP_ARGS) {
 		break;
 	case APP_EVENT_DRAW:
 		serial_draw((uint8_t*)data);
+		break;
 	}
 }
 

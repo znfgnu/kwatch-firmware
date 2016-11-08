@@ -14,10 +14,10 @@
 #define APP_ARGS_PROTO	uint8_t, void*
 #define APP_ARGS		uint8_t id, void* data
 
-typedef struct AppResponse {
-	uint8_t type;
-	void* data;
-};
+//typedef struct AppResponse {
+//	uint8_t type;
+//	void* data;
+//} AppResponse;
 
 // Application structure. Stores data needed to communicate with firmware
 typedef struct App{

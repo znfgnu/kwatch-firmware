@@ -36,5 +36,6 @@ void lcd_scroll(uint8_t);
 void lcd_invert(uint8_t);
 void lcd_set_contrast(uint8_t);
 void lcd_update();
+void lcd_clearbuffer();
 
 #endif /* LCD_H_ */

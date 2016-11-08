@@ -90,6 +90,14 @@ void lcd_update() {
 	lcdI2CUpdateScreen((uint8_t*)lcd_buffer);
 }
 
+void lcd_clearbuffer() {
+	for (int i=0; i<LCD_PAGES; ++i) {
+		for (int j=0; j<LCD_HEIGHT; ++j) {
+			lcd_buffer[i][j] = 0x00;
+		}
+	}
+}
+
 // --- begin private functions
 
 

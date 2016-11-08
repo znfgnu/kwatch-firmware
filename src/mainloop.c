@@ -8,6 +8,7 @@
 #include "mainloop.h"
 #include "led.h"
 #include "lcd.h"
+#include "dma.h"
 #include "app_mgr.h"
 #include "app_events.h"
 #include "app__serial.h"
@@ -21,6 +22,7 @@ void run() {
 		(app__serial.handler)(APP_EVENT_BT_BYTE, (void*)c);
 
 		// nierozlaczne
+		lcd_clearbuffer();
 		(app__serial.handler)(APP_EVENT_DRAW, (void*)lcd_buffer);
 		lcd_update();
 
