@@ -13,7 +13,7 @@
 #define APP__WATCHFACE_ID	0x88
 
 extern App app__watchface;
-void watchfacehandler(APP_ARGS_PROTO);
+//void watchfacehandler(APP_ARGS_PROTO);
 
 void app__watchface_init();
 

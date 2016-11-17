@@ -151,8 +151,8 @@ g_pfnVectors:
 	.word	0
 	.word	0
 	.word	0
-	.word	0
-	.word	0
+	.word	TIM2_IRQHandler
+	.word	TIM3_IRQHandler
 	.word	0
 	.word	0
 	.word	0
@@ -240,6 +240,9 @@ g_pfnVectors:
 
 	.weak	SysTick_Handler
 	.thumb_set SysTick_Handler,Default_Handler
+
+	.weak	TIM2_IRQHandler
+	.thumb_set TIM2_IRQHandler,Default_Handler
 
 	.weak	SystemInit
 

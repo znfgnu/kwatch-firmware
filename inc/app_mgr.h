@@ -24,6 +24,7 @@ typedef struct App{
 	uint32_t id;										// unique application ID
 //	uint8_t framebuffer[UI_APP_HEIGHT][UI_APP_WIDTH];	// private framebuffer
 	void (*handler)(APP_ARGS_PROTO);					// handler for events
+	uint8_t needs_redraw;
 } App;
 
 extern App* foreground;

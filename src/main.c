@@ -16,6 +16,7 @@
 #include "ui.h"
 #include "dma.h"
 #include "mainloop.h"
+#include "timers.h"
 #include "app__watchface.h"
 
 void Delay(uint32_t count){
@@ -34,6 +35,8 @@ int main(void)
 	uart_open(USART1, 115200);
 	lcd_init();
 	dma_init();
+	btn_init();
+	timers_init();
 
 	app__watchface_init();
 	app_wakeup(&app__watchface);
