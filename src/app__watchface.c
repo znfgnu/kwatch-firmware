@@ -17,7 +17,7 @@
 App app__watchface;
 static App* app = &app__watchface;
 
-static uint8_t time[4] = {0, 0, 0, 0};
+static uint8_t time[6] = {0, 0, 0, 0, 0, 0};
 static uint16_t date[3] = {15, 1, 2017};
 //		hours_tens = 0,
 //		hours_units = 0,
@@ -62,7 +62,42 @@ static void watchface_draw(uint8_t* drawbuf) {
 	startcol = 112;
 	draw_icon(icon_exclamation, startline, startcol);
 
+	// seconds (debug)
+	startcol = LCD_WIDTH - 2*LCD_FONT_DEFAULT_WIDTH_TOTAL;
+	startline = 7;
 
+	print_char('0'+time[4], startline, startcol);
+	print_char('0'+time[5], startline, startcol+LCD_FONT_DEFAULT_WIDTH_TOTAL);
+
+
+}
+
+static void watchface_secondelapsed() {
+	time[5]++;
+	if (time[5] == 10) {
+		time[5] = 0;
+		time[4]++;
+		if (time[4] == 6) {
+			time[4] = 0;
+			time[3]++;
+			if (time[3] == 10) {
+				time[3] = 0;
+				time[2]++;
+				if (time[2] == 6) {
+					time[2] = 0;
+					time[1]++;
+					if (time[1] == 4 && time[0] == 2) {
+						time[1] = 0;
+						time[0] = 0;
+					}
+					else if (time[1] == 10) {
+						time[1] = 0;
+						time[0]++;
+					}
+				}
+			}
+		}
+	}
 }
 
 void watchfacehandler(APP_ARGS) {
@@ -72,6 +107,9 @@ void watchfacehandler(APP_ARGS) {
 //		break;
 	case APP_EVENT_DRAW:
 		watchface_draw((uint8_t*)data);
+		break;
+	case APP_EVENT_SECOND_ELAPSED:
+		watchface_secondelapsed();
 		break;
 	}
 }
