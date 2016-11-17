@@ -26,7 +26,7 @@ void app_sleep(App* app) {
 
 void app_wakeup(App* app) {
 	// 1. Copy framebuffer
-	app->handler(APP_EVENT_DRAW, &lcd_buffer);
+//	app->handler(APP_EVENT_DRAW, &lcd_buffer);
 	foreground = app;
 //	app->handler
 }

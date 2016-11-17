@@ -16,7 +16,7 @@
 #include "ui.h"
 #include "dma.h"
 #include "mainloop.h"
-#include "app__serial.h"
+#include "app__watchface.h"
 
 void Delay(uint32_t count){
 	while(count--);
@@ -35,8 +35,8 @@ int main(void)
 	lcd_init();
 	dma_init();
 
-	app__serial_init();
-	app_wakeup(&app__serial);
+	app__watchface_init();
+	app_wakeup(&app__watchface);
 
 	run();
 

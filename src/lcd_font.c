@@ -6,6 +6,8 @@
  */
 
 #include <stdint.h>
+#include "lcd.h"
+#include "lcd_font.h"
 
 const uint8_t lcd_font_default[] = {
   0x00, 0x00, 0x00, 0x00, 0x00,  // 0
@@ -264,4 +266,18 @@ const uint8_t lcd_font_default[] = {
   0x00, 0x3C, 0x3C, 0x3C, 0x3C,
   0x00, 0x00, 0x00, 0x00, 0x00,
 };
+
+void print_char(const char c, int line, int col) {
+	for (int i=0; i<LCD_FONT_DEFAULT_WIDTH; i++)
+		lcd_buffer[line][col++] = lcd_font_default[LCD_FONT_DEFAULT_WIDTH*c+i];
+	lcd_buffer[line][col] = 0x00;
+}
+
+void print_string(const char* str, int line, int col) {
+	while (*str) {
+		print_char(*str, line, col);
+		col += LCD_FONT_DEFAULT_WIDTH_TOTAL;
+		str++;
+	}
+}
 
