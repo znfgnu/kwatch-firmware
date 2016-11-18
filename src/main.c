@@ -10,39 +10,30 @@
 
 
 #include "stm32f10x.h"
-#include "stm32f10x_gpio.h"
 #include "lcd.h"
 #include "led.h"
 #include "uart.h"
-#include "ui.h"
-#include "app_mgr.h"
-#include "app_events.h"
+#include "dma.h"
+#include "mainloop.h"
+#include "timers.h"
+#include "btn.h"
+#include "app__watchface.h"
 #include "app__serial.h"
-
-void Delay(uint32_t count){
-	while(count--);
-}
-
-#define LITTLE_DELAY	3000000
-
-int counter = 0;
 
 int main(void)
 {
-	ui_init();
 	led_init();
+	led_on(LED_VIBR);
 	uart_open(USART1, 115200);
 	lcd_init();
+	dma_init();
+	btn_init();
+	timers_init();
 
+	// initialize your apps here:
+	app__watchface_init();
 	app__serial_init();
-	app_wakeup(&app__serial);
 
-	for(int i=0; ;) {
-		uint8_t c = uart_getc(USART1);
-		(app__serial.handler)(APP_EVENT_BT_BYTE, (void*)c);
-
-		i++;
-		if (i&1) led_on(LED_GREEN);
-		else led_off(LED_GREEN);
-	}
+	run();
+	// shouldn't reach here.
 }

@@ -8,23 +8,15 @@
 #ifndef APP_EVENTS_H_
 #define APP_EVENTS_H_
 
-#define APP_EVENT_BT_BYTE			0x01		// received one byte via bluetooth
+#define APP_EVENT_BT_BYTE			0x00000001		// received one byte via bluetooth
+#define APP_EVENT_SECOND_ELAPSED	0x00000002		// one second elapsed
 
-#define APP_EVENT_BTN_UP_PRESSED	0x20
-#define APP_EVENT_BTN_UP_RELEASED	0x21
-#define APP_EVENT_BTN_UP_HOLD		0x22
+#define APP_EVENT_DRAW				0x00000004
+#define APP_EVENT_SPAWN				0x00000008		// unmaskable
 
-#define APP_EVENT_BTN_DN_PRESSED	0x30
-#define APP_EVENT_BTN_DN_RELEASED	0x31
-#define APP_EVENT_BTN_DN_HOLD		0x32
-
-#define APP_EVENT_BTN_OK_PRESSED	0x40
-#define APP_EVENT_BTN_OK_RELEASED	0x41
-#define APP_EVENT_BTN_OK_HOLD		0x42
-
-#define APP_EVENT_BTN_BK_PRESSED	0x50
-#define APP_EVENT_BTN_BK_RELEASED	0x51
-#define APP_EVENT_BTN_BK_HOLD		0x52
+#define APP_EVENT_BTN_PRESSED		0x00000010
+#define APP_EVENT_BTN_HELD			0x00000020
+#define APP_EVENT_BTN_RELEASED		0x00000040
 
 
 #endif /* APP_EVENTS_H_ */

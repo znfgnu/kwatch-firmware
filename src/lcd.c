@@ -19,6 +19,7 @@ void lcdI2CUpdatePage(uint8_t, uint8_t*);
 void lcdI2CUpdateScreen(uint8_t*);
 
 uint8_t lcd_buffer[LCD_PAGES][LCD_WIDTH];
+uint8_t lcd_is_on = 1;
 
 void lcd_init() {
 	lcdI2CInit();
@@ -78,6 +79,14 @@ void lcd_invert(uint8_t inverted) {
 	lcdI2CStop();
 }
 
+void lcd_turnon(uint8_t on) {
+	lcd_is_on = on;
+	lcdI2CStart(LCD_I2C_ADDR);
+	lcdI2CWrite(LCD_I2C_CMD_TOKEN);
+	lcdI2CWrite(LCD_CMD_DISPLAYON(on));
+	lcdI2CStop();
+}
+
 void lcd_set_contrast(uint8_t contrast) {
 	lcdI2CStart(LCD_I2C_ADDR);
 	lcdI2CWrite(LCD_I2C_CMD_TOKEN);
@@ -88,6 +97,14 @@ void lcd_set_contrast(uint8_t contrast) {
 
 void lcd_update() {
 	lcdI2CUpdateScreen((uint8_t*)lcd_buffer);
+}
+
+void lcd_clearbuffer() {
+	for (int i=0; i<LCD_PAGES; ++i) {
+		for (int j=0; j<LCD_WIDTH; ++j) {
+			lcd_buffer[i][j] = 0x00;
+		}
+	}
 }
 
 // --- begin private functions
@@ -127,6 +144,7 @@ void lcdI2CInit() {
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1, ENABLE);		// PB6-7 -> I2C1 pins pack 1
 
+//	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11;
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_OD;			// alternate function (I2C here)
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
