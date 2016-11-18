@@ -28,10 +28,9 @@ extern uint8_t btn_released;
 #define BTN_MASK_DOWN	0x08
 
 // Buttons pulled UP
-
-#define BTN_PUSHED		0x0E	// 2 last readings are "pushed", following 2 "released" bits, checking last 4 bits
+#define BTN_PUSHED		0x06	// 2 last readings are "pushed", following 1 "released" bit, checking last 3 bits
 #define BTN_HELD		0x80000000	// only earliest bit "released", checking 32 bits
-#define BTN_RELEASED	0x01	// 2 last readings are "released", following 2 "pushed" bits, checking last 4 bits
+#define BTN_RELEASED	0x01	// 2 last readings are "released", following 1 "pushed" bit, checking last 3 bits
 
 #define BTN_PORT_OFFSET	12		// btns starting from pin 12
 

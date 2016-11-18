@@ -6,6 +6,7 @@
  */
 
 #include "app__watchface.h"
+#include "app__serial.h"
 #include "app_events.h"
 #include "lcd_watchface_font.h"
 #include "lcd_font.h"
@@ -22,8 +23,8 @@ static uint8_t time[6] = {2, 3, 5, 8, 0, 0};
 static uint16_t date[3] = {15, 1, 2017};
 
 //debug
-char* lastev = "Brak";
-uint8_t btn_no = 8;
+char* lastev = "Hello!";
+uint8_t btn_no = 0x0F;
 //-debug
 
 #define BUF2(x,y) drawbuf[LCD_WIDTH*(x)+(y)]
@@ -46,7 +47,6 @@ static void watchface_draw(uint8_t* drawbuf) {
 	}
 
 	// todo: colon
-
 
 	startcol = 8;
 	startline = 6;
@@ -115,8 +115,17 @@ static void watchface_btn_pressed(uint32_t btn) {
 
 	if (btn & BTN_MASK_BACK) {
 		lcd_turnon(lcd_is_on ^ 1);
+		return;
+	} else if (!lcd_is_on) {
+		lcd_turnon(1);
 	}
+
+	if (btn & BTN_MASK_OK) {
+		app_spawn(&app__serial);
+	}
+
 }
+
 static void watchface_btn_held(uint32_t btn) {
 	btn_no = btn;
 	lastev = "held";
@@ -128,11 +137,11 @@ static void watchface_btn_released(uint32_t btn) {
 	app->needs_redraw = 1;
 }
 
-void watchfacehandler(APP_ARGS) {
+static void watchfacehandler(APP_ARGS) {
 	switch(id) {
-//	case APP_EVENT_BT_BYTE:
-//		watchface_handle_char((uint8_t)data);
-//		break;
+	case APP_EVENT_SPAWN:
+		app->needs_redraw = 1;
+		break;
 	case APP_EVENT_DRAW:
 		watchface_draw((uint8_t*)data);
 		break;
@@ -150,7 +159,6 @@ void watchfacehandler(APP_ARGS) {
 		break;
 	}
 }
-
 
 void app__watchface_init() {
 	app_init(app, APP__WATCHFACE_ID, &watchfacehandler,

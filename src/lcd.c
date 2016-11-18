@@ -101,7 +101,7 @@ void lcd_update() {
 
 void lcd_clearbuffer() {
 	for (int i=0; i<LCD_PAGES; ++i) {
-		for (int j=0; j<LCD_HEIGHT; ++j) {
+		for (int j=0; j<LCD_WIDTH; ++j) {
 			lcd_buffer[i][j] = 0x00;
 		}
 	}

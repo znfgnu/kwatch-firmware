@@ -13,23 +13,15 @@
 #include "lcd.h"
 #include "led.h"
 #include "uart.h"
-#include "ui.h"
 #include "dma.h"
 #include "mainloop.h"
 #include "timers.h"
+#include "btn.h"
 #include "app__watchface.h"
-
-void Delay(uint32_t count){
-	while(count--);
-}
-
-#define LITTLE_DELAY	3000000
-
-int counter = 0;
+#include "app__serial.h"
 
 int main(void)
 {
-	ui_init();
 	led_init();
 	led_on(LED_VIBR);
 	uart_open(USART1, 115200);
@@ -38,9 +30,10 @@ int main(void)
 	btn_init();
 	timers_init();
 
+	// initialize your apps here:
 	app__watchface_init();
-	app_wakeup(&app__watchface);
+	app__serial_init();
 
 	run();
-
+	// shouldn't reach here.
 }

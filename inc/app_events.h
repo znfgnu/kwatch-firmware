@@ -12,6 +12,7 @@
 #define APP_EVENT_SECOND_ELAPSED	0x00000002		// one second elapsed
 
 #define APP_EVENT_DRAW				0x00000004
+#define APP_EVENT_SPAWN				0x00000008		// unmaskable
 
 #define APP_EVENT_BTN_PRESSED		0x00000010
 #define APP_EVENT_BTN_HELD			0x00000020

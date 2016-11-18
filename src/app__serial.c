@@ -7,8 +7,10 @@
 
 #include "app__serial.h"
 #include "app_events.h"
+#include "app_mgr.h"
 #include "lcd_font.h"
 #include "lcd.h"
+#include "btn.h"
 
 // Application structure
 App app__serial;
@@ -35,10 +37,8 @@ static void serial_new_line() {
 }
 
 static void serial_print_char(uint8_t c) {
-
 	// 1. Draw character in right place
 	textdata[line][col] = c;
-
 
 	col++;
 	if (col == total_cols) {
@@ -92,29 +92,33 @@ static void serial_draw(uint8_t* drawbuf) {
 		textcol = 0;
 		lcdcol=0;
 		for (; textcol<total_cols; textcol++) {
-
 			int k;
 			char c = textdata[textline][textcol];
 			for (k=0; k<LCD_FONT_DEFAULT_WIDTH; k++)
 				BUF(lcdline, lcdcol++) = lcd_font_default[LCD_FONT_DEFAULT_WIDTH*c+k];
 			for (; k<LCD_FONT_DEFAULT_WIDTH_TOTAL; k++)
 				BUF(lcdline, lcdcol++) = 0x00;
-
 		}
 	}
-
-
-
-
 }
 
-void serialhandler(APP_ARGS) {
+static void serial_btn_pressed(uint32_t btn) {
+	if (btn & BTN_MASK_BACK) app_quit();
+}
+
+static void serialhandler(APP_ARGS) {
 	switch(id) {
+	case APP_EVENT_SPAWN:
+		app->needs_redraw = 1;
+		break;
 	case APP_EVENT_BT_BYTE:
 		serial_handle_char((uint8_t)data);
 		break;
 	case APP_EVENT_DRAW:
 		serial_draw((uint8_t*)data);
+		break;
+	case APP_EVENT_BTN_PRESSED:
+		serial_btn_pressed((uint32_t)data);
 		break;
 	}
 }
@@ -122,7 +126,7 @@ void serialhandler(APP_ARGS) {
 
 void app__serial_init() {
 	app_init(app, APP__SERIAL_ID, &serialhandler,
-			APP_EVENT_BTN_PRESSED,	// foreground
+			APP_EVENT_BTN_PRESSED | APP_EVENT_DRAW | APP_EVENT_BT_BYTE,	// foreground
 			APP_EVENT_BT_BYTE
 			);
 }

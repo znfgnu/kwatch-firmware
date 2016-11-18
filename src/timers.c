@@ -15,7 +15,6 @@
 int timer_seconds = 0;
 
 void timer_persecond_init() {
-	// the only timer so far: per second
 	RCC_APB1PeriphClockCmd(RCC_APB1ENR_TIM2EN, ENABLE);
 
 	// for 24 MHz:
@@ -31,7 +30,6 @@ void timer_persecond_init() {
 	TIM_TimeBaseInit(TIM2, &timerInitStructure);
 	TIM_Cmd(TIM2, ENABLE);
 
-
 	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
 
 	NVIC_InitTypeDef nvicStructure;
@@ -43,12 +41,11 @@ void timer_persecond_init() {
 }
 
 void timer_btndebounce_init() {
-	// the only timer so far: per second
 	RCC_APB1PeriphClockCmd(RCC_APB1ENR_TIM3EN, ENABLE);
 
 	// for 24 MHz:
-	// timer ticks each 1ms
-	// timer overflows each 1000ms (1sec)
+	// timer ticks each 20us
+	// timer overflows each 20ms
 
 	TIM_TimeBaseInitTypeDef timerInitStructure;
 	timerInitStructure.TIM_Prescaler = 480;
@@ -58,7 +55,6 @@ void timer_btndebounce_init() {
 	timerInitStructure.TIM_RepetitionCounter = 0;
 	TIM_TimeBaseInit(TIM3, &timerInitStructure);
 	TIM_Cmd(TIM3, ENABLE);
-
 
 	TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
 
@@ -75,13 +71,9 @@ void timers_init() {
 	timer_btndebounce_init();
 }
 
-//uint8_t ledstate=0;
-
 void TIM2_IRQHandler() {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-
-		// changing
 		timer_seconds++;
 	}
 }
@@ -95,17 +87,9 @@ void TIM3_IRQHandler() {
 		for (int i=0; i<4; i++) {
 			btn_state[i] = ((state>>i)&1) | btn_state[i]<<1;	// push one bit
 
-			if ((btn_state[i] & 0x0F) == BTN_PUSHED) btn_pushed |= (1<<i);
-			else if ((btn_state[i] & 0x0F) == BTN_RELEASED) btn_released |= (1<<i);
+			if ((btn_state[i] & 0x07) == BTN_PUSHED) btn_pushed |= (1<<i);
+			else if ((btn_state[i] & 0x07) == BTN_RELEASED) btn_released |= (1<<i);
 			if (btn_state[i] == BTN_HELD) btn_held |= (1<<i);
 		}
-
-
-
-
-//		if (ledstate) led_off(LED_GREEN);
-//		else led_on(LED_GREEN);
-//		ledstate ^= 1;
-
 	}
 }

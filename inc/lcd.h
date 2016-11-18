@@ -35,6 +35,7 @@ extern uint8_t lcd_is_on;
 void lcd_init(void);
 void lcd_scroll(uint8_t);
 void lcd_invert(uint8_t);
+void lcd_turnon(uint8_t);
 void lcd_set_contrast(uint8_t);
 void lcd_update();
 void lcd_clearbuffer();

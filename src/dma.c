@@ -17,9 +17,6 @@ void dma_init() {
 	DMA_InitTypeDef dmaInitStruct;
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1 , ENABLE);
 
-
-
-
 	dmaInitStruct.DMA_BufferSize = strlen(dmaBuffer);
 	dmaInitStruct.DMA_DIR = DMA_DIR_PeripheralDST;
 	dmaInitStruct.DMA_M2M = DMA_M2M_Disable;

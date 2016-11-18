@@ -8,7 +8,7 @@
 #ifndef APP_MGR_H_
 #define APP_MGR_H_
 
-#include "ui.h"
+#include <stdint.h>
 
 // Handler arguments
 #define APP_ARGS_PROTO	uint32_t, void*
@@ -19,7 +19,6 @@
 // Application structure. Stores data needed to communicate with firmware
 typedef struct App{
 	uint32_t id;										// unique application ID
-//	uint8_t framebuffer[UI_APP_HEIGHT][UI_APP_WIDTH];	// private framebuffer
 	void (*handler)(APP_ARGS_PROTO);					// handler for events
 	uint8_t needs_redraw;
 
@@ -28,13 +27,13 @@ typedef struct App{
 } App;
 
 extern App* foreground;
-//extern App* installed_apps[];
+
 #define ISFOREGROUND(x)	(foreground==x)
 
 void app_init(App*, uint32_t, void(*)(APP_ARGS), uint32_t, uint32_t);
-void app_sleep(App*);	// to background
-void app_wakeup(App*);	// to foreground
-//void app_updatescreen(App*);
+void app_spawn(App*);
+void app_quit();
+App* app_get_active_app();
 
 void app_notify_event(APP_ARGS_PROTO);
 

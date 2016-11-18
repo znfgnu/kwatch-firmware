@@ -14,7 +14,7 @@
 extern const uint8_t lcd_font_default[255*5];
 
 
-#define LETTER(c, seg)	(lcd_font_default[LCD_FONT_DEFAULT_WIDTH*(c)+seg])
+#define LETTER(c, seg)	(lcd_font_default[LCD_FONT_DEFAULT_WIDTH*(c)+(seg)])
 
 void print_char(const char, int, int);
 void print_string(const char*, int, int);
