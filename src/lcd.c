@@ -19,6 +19,7 @@ void lcdI2CUpdatePage(uint8_t, uint8_t*);
 void lcdI2CUpdateScreen(uint8_t*);
 
 uint8_t lcd_buffer[LCD_PAGES][LCD_WIDTH];
+uint8_t lcd_is_on = 1;
 
 void lcd_init() {
 	lcdI2CInit();
@@ -75,6 +76,14 @@ void lcd_invert(uint8_t inverted) {
 	lcdI2CStart(LCD_I2C_ADDR);
 	lcdI2CWrite(LCD_I2C_CMD_TOKEN);
 	lcdI2CWrite(LCD_CMD_INVERTED(inverted));
+	lcdI2CStop();
+}
+
+void lcd_turnon(uint8_t on) {
+	lcd_is_on = on;
+	lcdI2CStart(LCD_I2C_ADDR);
+	lcdI2CWrite(LCD_I2C_CMD_TOKEN);
+	lcdI2CWrite(LCD_CMD_DISPLAYON(on));
 	lcdI2CStop();
 }
 

@@ -121,5 +121,8 @@ void serialhandler(APP_ARGS) {
 
 
 void app__serial_init() {
-	app_init(app, APP__SERIAL_ID, &serialhandler);
+	app_init(app, APP__SERIAL_ID, &serialhandler,
+			APP_EVENT_BTN_PRESSED,	// foreground
+			APP_EVENT_BT_BYTE
+			);
 }

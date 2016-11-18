@@ -17,31 +17,10 @@ void btn_init() {
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-//	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-//	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 
-uint32_t btn_state[4];
+uint32_t btn_state[4] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
 uint8_t btn_pushed;
 uint8_t btn_held;
 uint8_t btn_released;
-
-
-
-
-
-//
-//extern int counter;
-//
-//void EXTI0_IRQHandler() {
-//	counter++;
-//	lcdScroll(counter&0x3F);
-//	EXTI_ClearITPendingBit(EXTI_Line0);
-//}
-//
-//void EXTI1_IRQHandler() {
-//	counter--;
-//	lcdScroll(counter&0x3F);
-//	EXTI_ClearITPendingBit(EXTI_Line1);
-//}

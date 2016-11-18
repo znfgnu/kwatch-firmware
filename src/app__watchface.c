@@ -12,6 +12,7 @@
 #include "lcd.h"
 #include "strings.h"
 #include "icons8px.h"
+#include "btn.h"
 
 // Application structure
 App app__watchface;
@@ -19,17 +20,10 @@ static App* app = &app__watchface;
 
 static uint8_t time[6] = {2, 3, 5, 8, 0, 0};
 static uint16_t date[3] = {15, 1, 2017};
-//		hours_tens = 0,
-//		hours_units = 0,
-//		minutes_tens = 0,
-//		minutes_units = 0;
-
 
 //debug
-
 char* lastev = "Brak";
 uint8_t btn_no = 8;
-
 //-debug
 
 #define BUF2(x,y) drawbuf[LCD_WIDTH*(x)+(y)]
@@ -118,6 +112,10 @@ static void watchface_btn_pressed(uint32_t btn) {
 	btn_no = btn;
 	lastev = "pressed";
 	app->needs_redraw = 1;
+
+	if (btn & BTN_MASK_BACK) {
+		lcd_turnon(lcd_is_on ^ 1);
+	}
 }
 static void watchface_btn_held(uint32_t btn) {
 	btn_no = btn;
@@ -155,5 +153,7 @@ void watchfacehandler(APP_ARGS) {
 
 
 void app__watchface_init() {
-	app_init(app, APP__WATCHFACE_ID, &watchfacehandler);
+	app_init(app, APP__WATCHFACE_ID, &watchfacehandler,
+			APP_EVENT_BTN_HELD | APP_EVENT_BTN_PRESSED | APP_EVENT_BTN_RELEASED | APP_EVENT_DRAW | APP_EVENT_SECOND_ELAPSED,	// foreground
+			APP_EVENT_SECOND_ELAPSED);
 }

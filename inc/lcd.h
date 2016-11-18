@@ -30,6 +30,7 @@
 
 
 extern uint8_t lcd_buffer[LCD_PAGES][LCD_WIDTH];
+extern uint8_t lcd_is_on;
 
 void lcd_init(void);
 void lcd_scroll(uint8_t);

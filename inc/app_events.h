@@ -8,14 +8,14 @@
 #ifndef APP_EVENTS_H_
 #define APP_EVENTS_H_
 
-#define APP_EVENT_BT_BYTE			0x01		// received one byte via bluetooth
-#define APP_EVENT_SECOND_ELAPSED	0x02		// one second elapsed
+#define APP_EVENT_BT_BYTE			0x00000001		// received one byte via bluetooth
+#define APP_EVENT_SECOND_ELAPSED	0x00000002		// one second elapsed
 
-#define APP_EVENT_DRAW				0x10
+#define APP_EVENT_DRAW				0x00000004
 
-#define APP_EVENT_BTN_PRESSED		0x20
-#define APP_EVENT_BTN_HELD			0x21
-#define APP_EVENT_BTN_RELEASED		0x22
+#define APP_EVENT_BTN_PRESSED		0x00000010
+#define APP_EVENT_BTN_HELD			0x00000020
+#define APP_EVENT_BTN_RELEASED		0x00000040
 
 
 #endif /* APP_EVENTS_H_ */

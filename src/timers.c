@@ -75,7 +75,7 @@ void timers_init() {
 	timer_btndebounce_init();
 }
 
-uint8_t ledstate=0;
+//uint8_t ledstate=0;
 
 void TIM2_IRQHandler() {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
@@ -103,9 +103,9 @@ void TIM3_IRQHandler() {
 
 
 
-		if (ledstate) led_off(LED_GREEN);
-		else led_on(LED_GREEN);
-		ledstate ^= 1;
+//		if (ledstate) led_off(LED_GREEN);
+//		else led_on(LED_GREEN);
+//		ledstate ^= 1;
 
 	}
 }
