@@ -15,6 +15,7 @@
 #include "app__watchface.h"
 #include "timers.h"
 #include "btn.h"
+#include "uart.h"
 
 void run() {
 	app_spawn(&app__watchface);	// root app
@@ -53,11 +54,17 @@ void run() {
 			btn_released = 0;
 		}
 
+		// 3. bluetooth message
+		if (buffer_ready) {
+			app_notify_event(APP_EVENT_BT_MSG, (void*)input_buffer);
+			buffer_ready = 0;
+		}
+
 		// if needs redraw, do it now.
 		if (foreground->needs_redraw && lcd_is_on) {
+			foreground->needs_redraw=0;
 			lcd_clearbuffer();
 			app_notify_event(APP_EVENT_DRAW, (void*)lcd_buffer);
-			foreground->needs_redraw=0;
 			lcd_update();
 		}
 	}

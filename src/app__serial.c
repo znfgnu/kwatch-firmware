@@ -34,6 +34,7 @@ static void serial_new_line() {
 		for (int j=0; j<total_cols; j++) textdata[total_lines-1][j]=0x00;
 	}
 	else line++;
+	col = 0;
 }
 
 static void serial_print_char(uint8_t c) {
@@ -57,15 +58,16 @@ static void serial_remove_last_char() {
 
 static void serial_handle_char(uint8_t c) {
 	switch(c){
-	case '\r':
-		col = 0;	// carriage return
-		break;
+//	case '\r':
+//		col = 0;	// carriage return
+//		break;
 	case '\n':
 		serial_new_line();
 		break;
 	case 0x7F:		// backspace
 		serial_remove_last_char();
 		break;
+	case '\r':
 	case '\0':
 		break;
 	default:
@@ -102,7 +104,25 @@ static void serial_draw(uint8_t* drawbuf) {
 	}
 }
 
+static void serial_handle_string(char* s) {
+	while (*s) {
+		serial_handle_char(*s);
+		s++;
+	}
+}
+
+static void serial_handle_msg(char* msg) {
+	serial_handle_string("bt> ");
+	serial_handle_string(msg);
+	serial_new_line();
+}
+
+
 static void serial_btn_pressed(uint32_t btn) {
+	serial_handle_string("btn> ");
+	serial_handle_string("pressed ");
+	serial_handle_char('0'+btn);
+	serial_new_line();
 	if (btn & BTN_MASK_BACK) app_quit();
 }
 
@@ -111,14 +131,16 @@ static void serialhandler(APP_ARGS) {
 	case APP_EVENT_SPAWN:
 		app->needs_redraw = 1;
 		break;
-	case APP_EVENT_BT_BYTE:
-		serial_handle_char((uint8_t)data);
+	case APP_EVENT_BT_MSG:
+		serial_handle_msg((char*)data);
+		app->needs_redraw = 1;
 		break;
 	case APP_EVENT_DRAW:
 		serial_draw((uint8_t*)data);
 		break;
 	case APP_EVENT_BTN_PRESSED:
 		serial_btn_pressed((uint32_t)data);
+		app->needs_redraw = 1;
 		break;
 	}
 }
@@ -126,7 +148,7 @@ static void serialhandler(APP_ARGS) {
 
 void app__serial_init() {
 	app_init(app, APP__SERIAL_ID, &serialhandler,
-			APP_EVENT_BTN_PRESSED | APP_EVENT_DRAW | APP_EVENT_BT_BYTE,	// foreground
-			APP_EVENT_BT_BYTE
+			APP_EVENT_BTN_PRESSED | APP_EVENT_DRAW | APP_EVENT_BT_MSG,	// foreground
+			APP_EVENT_BT_MSG
 			);
 }

@@ -19,14 +19,15 @@
 #include "btn.h"
 #include "app__watchface.h"
 #include "app__serial.h"
+#include "config.h"
 
 int main(void)
 {
 	led_init();
 	led_on(LED_VIBR);
-	uart_open(USART1, 115200);
+	uart_init();
 	lcd_init();
-	dma_init();
+//	dma_init();
 	btn_init();
 	timers_init();
 

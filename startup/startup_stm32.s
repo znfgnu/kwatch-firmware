@@ -160,7 +160,7 @@ g_pfnVectors:
 	.word	0
 	.word	0
 	.word	0
-	.word	0
+	.word	USART1_IRQHandler
 	.word	0
 	.word	0
 	.word	0
@@ -243,6 +243,9 @@ g_pfnVectors:
 
 	.weak	TIM2_IRQHandler
 	.thumb_set TIM2_IRQHandler,Default_Handler
+
+	.weak	USART1_IRQHandler
+	.thumb_set USART1_IRQHandler,Default_Handler
 
 	.weak	SystemInit
 

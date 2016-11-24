@@ -16,7 +16,7 @@ static uint8_t number_of_apps = 0;
 static App* stack[APPMGR_MAX_APPS];
 static uint8_t stack_size = 0;
 
-void app_init(App* app, uint32_t id, void (*handler)(APP_ARGS_PROTO), uint32_t events_foreground, uint32_t events_background) {
+void app_init(App* app, uint8_t id, void (*handler)(APP_ARGS_PROTO), uint32_t events_foreground, uint32_t events_background) {
 	app->id = id;
 	app->handler = handler;
 	app->needs_redraw = 0;
@@ -26,12 +26,25 @@ void app_init(App* app, uint32_t id, void (*handler)(APP_ARGS_PROTO), uint32_t e
 }
 
 void app_notify_event(APP_ARGS) {
-	for (int i=0; i<number_of_apps; i++) {
-		App* app = apps[i];
-		if (ISFOREGROUND(app)) {
-			if (app->events_when_foreground & id) app->handler(id, data);
+	// bt messages sniffing protection
+	if (id == APP_EVENT_BT_MSG) {
+		for (int i=0; i<number_of_apps; i++) {
+			App* app = apps[i];
+			if (*((uint8_t*)data) == app->id) {
+				app->handler(id, data+1);
+				break;
+			}
 		}
-		else if (app->events_when_background & id) app->handler(id, data);
+	}
+
+	else {
+		for (int i=0; i<number_of_apps; i++) {
+			App* app = apps[i];
+			if (ISFOREGROUND(app)) {
+				if (app->events_when_foreground & id) app->handler(id, data);
+			}
+			else if (app->events_when_background & id) app->handler(id, data);
+		}
 	}
 }
 

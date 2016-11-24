@@ -10,7 +10,7 @@
 
 #include "app_mgr.h"
 
-#define APP__SERIAL_ID	0x77
+#define APP__SERIAL_ID	((uint8_t)'T')
 extern App app__serial;
 void app__serial_init();
 

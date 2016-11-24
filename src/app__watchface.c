@@ -137,6 +137,12 @@ static void watchface_btn_released(uint32_t btn) {
 	app->needs_redraw = 1;
 }
 
+static void watchface_msg(char* data) {
+	for (int dig = 0; dig<6; dig++) {
+		time[dig] = data[dig]-'0';
+	}
+}
+
 static void watchfacehandler(APP_ARGS) {
 	switch(id) {
 	case APP_EVENT_SPAWN:
@@ -156,6 +162,9 @@ static void watchfacehandler(APP_ARGS) {
 		break;
 	case APP_EVENT_BTN_RELEASED:
 		watchface_btn_released((uint32_t)data);
+		break;
+	case APP_EVENT_BT_MSG:
+		watchface_msg((char*)data);
 		break;
 	}
 }

@@ -18,7 +18,7 @@
 
 // Application structure. Stores data needed to communicate with firmware
 typedef struct App{
-	uint32_t id;										// unique application ID
+	uint8_t id;										// unique application ID
 	void (*handler)(APP_ARGS_PROTO);					// handler for events
 	uint8_t needs_redraw;
 
@@ -30,7 +30,7 @@ extern App* foreground;
 
 #define ISFOREGROUND(x)	(foreground==x)
 
-void app_init(App*, uint32_t, void(*)(APP_ARGS), uint32_t, uint32_t);
+void app_init(App*, uint8_t, void(*)(APP_ARGS), uint32_t, uint32_t);
 void app_spawn(App*);
 void app_quit();
 App* app_get_active_app();

@@ -10,6 +10,12 @@
 #include <stm32f10x_gpio.h>
 #include <stm32f10x_usart.h>
 #include "uart.h"
+#include "config.h"
+
+char input_buffer[INPUT_BUFFER_SIZE];
+char* input_cursor = input_buffer;
+uint8_t buffer_ready = 0;	// 0 -> filling in progress, 1 -> reading in progress
+// TODO: more buffers!
 
 int uart_open (USART_TypeDef* USARTx, uint32_t baud)
 {
@@ -55,11 +61,21 @@ int uart_open (USART_TypeDef* USARTx, uint32_t baud)
   return 1;
 }
 
+void uart_interrupt_init() {
+	NVIC_InitTypeDef NVIC_InitStructure;
+	USART_ITConfig(BT_USART_PORT, USART_IT_RXNE, ENABLE);
 
-void uart_close(USART_TypeDef* USARTx)
-{
-    assert_param(IS_USART_123_PERIPH(USARTx));
+	NVIC_InitStructure.NVIC_IRQChannel = BT_USART_IRQN;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
 }
+
+//void uart_close(USART_TypeDef* USARTx)
+//{
+//    assert_param(IS_USART_123_PERIPH(USARTx));
+//}
 
 int uart_putc(int c, USART_TypeDef* USARTx)
 {
@@ -76,5 +92,30 @@ int uart_getc (USART_TypeDef* USARTx)
 
   while (USART_GetFlagStatus(USARTx, USART_FLAG_RXNE) == RESET);
   return  USARTx->DR & 0xff;
+}
+
+void uart_init() {
+	uart_open(BT_USART_PORT, BT_USART_BAUD);
+	uart_interrupt_init();
+}
+
+void USART1_IRQHandler() {
+	if( USART_GetITStatus(BT_USART_PORT, USART_IT_RXNE)) {
+		if (buffer_ready == 0) {
+			*input_cursor = BT_USART_PORT->DR;
+			if (*input_cursor == '\0') {
+				// go to next buffer
+				input_cursor = input_buffer;
+				buffer_ready = 1;
+			} else {
+				input_cursor++;
+			}
+		}
+		else {
+			// error, no space for more bytes
+			USART_ClearITPendingBit(BT_USART_PORT, USART_IT_RXNE);	// reading data register clears flag
+		}
+
+	}
 }
 

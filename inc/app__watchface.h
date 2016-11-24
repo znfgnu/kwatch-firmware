@@ -10,7 +10,7 @@
 
 #include "app_mgr.h"
 
-#define APP__WATCHFACE_ID	0x88
+#define APP__WATCHFACE_ID	((uint8_t)'t')
 extern App app__watchface;
 void app__watchface_init();
 

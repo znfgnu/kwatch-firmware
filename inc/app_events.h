@@ -8,7 +8,7 @@
 #ifndef APP_EVENTS_H_
 #define APP_EVENTS_H_
 
-#define APP_EVENT_BT_BYTE			0x00000001		// received one byte via bluetooth
+#define APP_EVENT_BT_MSG			0x00000001		// received msg via bluetooth
 #define APP_EVENT_SECOND_ELAPSED	0x00000002		// one second elapsed
 
 #define APP_EVENT_DRAW				0x00000004
