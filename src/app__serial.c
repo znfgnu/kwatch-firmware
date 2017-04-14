@@ -22,6 +22,8 @@ static const uint8_t total_lines = 7;
 static uint8_t line = 0;
 static uint8_t col = 0;
 
+static char testchar = '\0';
+
 static char textdata[7][18];	// I wasn't able to use constants
 
 static void serial_new_line() {
@@ -112,18 +114,29 @@ static void serial_handle_string(char* s) {
 }
 
 static void serial_handle_msg(char* msg) {
-	serial_handle_string("bt> ");
+	serial_handle_char(CHR_BT);
+	serial_handle_char(' ');
 	serial_handle_string(msg);
 	serial_new_line();
 }
 
 
 static void serial_btn_pressed(uint32_t btn) {
-	serial_handle_string("btn> ");
-	serial_handle_string("pressed ");
-	serial_handle_char('0'+btn);
-	serial_new_line();
-	if (btn & BTN_MASK_BACK) app_quit();
+	if (btn & BTN_MASK_BACK) {
+		app_quit();
+		return;
+	}
+
+	if (btn & BTN_MASK_UP) testchar++;
+	if (btn & BTN_MASK_DOWN) testchar--;
+
+	serial_handle_string("\x07 ");
+	serial_handle_char('0'+(testchar/100));
+	serial_handle_char('0'+((testchar/10)%10));
+	serial_handle_char('0'+(testchar%10));
+	serial_handle_string(": '");
+	serial_handle_char(testchar);
+	serial_handle_string("'\n");
 }
 
 static void serialhandler(APP_ARGS) {

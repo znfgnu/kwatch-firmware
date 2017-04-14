@@ -17,15 +17,15 @@ extern uint8_t btn_pushed;
 extern uint8_t btn_held;
 extern uint8_t btn_released;
 
-#define BTN_BACK	0
+#define BTN_BACK	3
 #define BTN_UP		1
-#define BTN_OK		2
-#define BTN_DOWN	3
+#define BTN_OK		0
+#define BTN_DOWN	2
 
-#define BTN_MASK_BACK	0x01
+#define BTN_MASK_BACK	0x08
 #define BTN_MASK_UP		0x02
-#define BTN_MASK_OK		0x04
-#define BTN_MASK_DOWN	0x08
+#define BTN_MASK_OK		0x01
+#define BTN_MASK_DOWN	0x04
 
 // Buttons pulled UP
 #define BTN_PUSHED		0x06	// 2 last readings are "pushed", following 1 "released" bit, checking last 3 bits
