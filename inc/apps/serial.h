@@ -5,8 +5,8 @@
  *      Author: konrad
  */
 
-#ifndef APP__SERIAL_H_
-#define APP__SERIAL_H_
+#ifndef APPS_SERIAL_H_
+#define APPS_SERIAL_H_
 
 #include "app_mgr.h"
 
@@ -14,4 +14,4 @@
 extern App app__serial;
 void app__serial_init();
 
-#endif /* APP__SERIAL_H_ */
+#endif /* APPS_SERIAL_H_ */

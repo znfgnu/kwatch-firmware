@@ -5,8 +5,8 @@
  *      Author: konrad
  */
 
-#ifndef APP__WATCHFACE_H_
-#define APP__WATCHFACE_H_
+#ifndef APPS_WATCHFACE_H_
+#define APPS_WATCHFACE_H_
 
 #include "app_mgr.h"
 
@@ -14,4 +14,4 @@
 extern App app__watchface;
 void app__watchface_init();
 
-#endif /* APP__WATCHFACE_H_ */
+#endif /* APPS_WATCHFACE_H_ */

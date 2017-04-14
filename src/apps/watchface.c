@@ -5,9 +5,9 @@
  *      Author: konrad
  */
 
-#include "app__watchface.h"
-#include "app__serial.h"
-#include "app__mainmenu.h"
+#include <apps/mainmenu.h>
+#include <apps/serial.h>
+#include <apps/watchface.h>
 #include "app_events.h"
 #include "lcd_watchface_font.h"
 #include "lcd_font.h"

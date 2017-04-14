@@ -9,6 +9,9 @@
 */
 
 
+#include <apps/mainmenu.h>
+#include <apps/serial.h>
+#include <apps/watchface.h>
 #include "stm32f10x.h"
 #include "lcd.h"
 #include "led.h"
@@ -16,9 +19,6 @@
 #include "mainloop.h"
 #include "timers.h"
 #include "btn.h"
-#include "app__watchface.h"
-#include "app__serial.h"
-#include "app__mainmenu.h"
 #include "config.h"
 
 int main(void)

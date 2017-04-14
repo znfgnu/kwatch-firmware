@@ -5,7 +5,7 @@
  *      Author: konrad
  */
 
-#include "app__serial.h"
+#include <apps/serial.h>
 #include "app_events.h"
 #include "app_mgr.h"
 #include "lcd_font.h"

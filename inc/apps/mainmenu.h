@@ -5,8 +5,8 @@
  *      Author: konrad
  */
 
-#ifndef APP__MAINMENU_H_
-#define APP__MAINMENU_H_
+#ifndef APPS_MAINMENU_H_
+#define APPS_MAINMENU_H_
 
 #include "app_mgr.h"
 
@@ -14,4 +14,4 @@
 extern App app__mainmenu;
 void app__mainmenu_init();
 
-#endif /* APP__MAINMENU_H_ */
+#endif /* APPS_MAINMENU_H_ */
