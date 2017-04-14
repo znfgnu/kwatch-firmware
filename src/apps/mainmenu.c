@@ -11,6 +11,9 @@
 #include "lcd.h"
 #include "btn.h"
 
+#include "apps/dummy.h"
+#include "apps/serial.h"
+
 // Application structure
 App app__mainmenu;
 static App* app = &app__mainmenu;
@@ -29,6 +32,19 @@ static char* appnames[] = {
 		"Hello, world",
 		"Settings",
 		"About",
+};
+
+static App* apppointers[] = {
+		&app__serial,
+		&app__dummy,
+		&app__dummy,
+		&app__dummy,
+		&app__dummy,
+		&app__dummy,
+		(App*) 0,
+		&app__dummy,
+		&app__dummy,
+		&app__dummy,
 };
 
 static uint8_t appsno = sizeof(appnames) / sizeof(appnames[0]);
@@ -78,6 +94,10 @@ static void btn_pressed_handler(uint32_t btn) {
 
 	if (btn & BTN_MASK_BACK) {
 		app_quit();
+	}
+
+	if (btn & BTN_MASK_OK) {
+		if (apppointers[chosen_app]) app_spawn(apppointers[chosen_app]);
 	}
 }
 

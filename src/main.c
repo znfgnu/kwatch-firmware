@@ -34,6 +34,7 @@ int main(void)
 	app__watchface_init();
 	app__serial_init();
 	app__mainmenu_init();
+	app__dummy_init();
 
 	run();
 	// shouldn't reach here.
