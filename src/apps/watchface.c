@@ -52,13 +52,13 @@ static void watchface_draw(uint8_t* drawbuf) {
 	startcol = 8;
 	startline = 6;
 	if (date[0] > 9) {
-		print_char('0'+date[0]/10, startline, startcol);
+		print_char('0'+date[0]/10, startline, startcol, drawbuf);
 		startcol += LCD_FONT_DEFAULT_WIDTH_TOTAL;
 	}
-	print_char('0'+date[0]%10, startline, startcol);
+	print_char('0'+date[0]%10, startline, startcol, drawbuf);
 	startcol += LCD_FONT_DEFAULT_WIDTH_TOTAL * 2;	// plus space
 
-	print_string(months[date[1]-1], startline, startcol);
+	print_string(months[date[1]-1], startline, startcol, drawbuf);
 
 
 	// number of notifications
@@ -69,15 +69,15 @@ static void watchface_draw(uint8_t* drawbuf) {
 	startcol = LCD_WIDTH - 2*LCD_FONT_DEFAULT_WIDTH_TOTAL;
 	startline = 7;
 
-	print_char('0'+time[4], startline, startcol);
-	print_char('0'+time[5], startline, startcol+LCD_FONT_DEFAULT_WIDTH_TOTAL);
+	print_char('0'+time[4], startline, startcol, drawbuf);
+	print_char('0'+time[5], startline, startcol+LCD_FONT_DEFAULT_WIDTH_TOTAL, drawbuf);
 
 	startcol = 0;
 	startline = 7;
 
-	print_char('0'+btn_no, startline, startcol);
+	print_char('0'+btn_no, startline, startcol, drawbuf);
 	startcol+=LCD_FONT_DEFAULT_WIDTH_TOTAL*2;
-	print_string(lastev, startline, startcol);
+	print_string(lastev, startline, startcol, drawbuf);
 }
 
 static void watchface_secondelapsed() {

@@ -268,15 +268,17 @@ const uint8_t lcd_font_default[] = {
   0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-void print_char(const char c, int line, int col) {
+#define BUF(l,c) (buf[LCD_WIDTH*(l)+(c)])
+
+void print_char(const char c, int line, int col, uint8_t* buf) {
 	for (int i=0; i<LCD_FONT_DEFAULT_WIDTH; i++)
-		lcd_buffer[line][col++] = lcd_font_default[LCD_FONT_DEFAULT_WIDTH*c+i];
-	lcd_buffer[line][col] = 0x00;
+		BUF(line, col++) = lcd_font_default[LCD_FONT_DEFAULT_WIDTH*c+i];
+	BUF(line, col) = 0x00;
 }
 
-void print_string(const char* str, int line, int col) {
+void print_string(const char* str, int line, int col, uint8_t* buf) {
 	while (*str) {
-		print_char(*str, line, col);
+		print_char(*str, line, col, buf);
 		col += LCD_FONT_DEFAULT_WIDTH_TOTAL;
 		str++;
 	}

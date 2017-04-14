@@ -15,26 +15,67 @@
 App app__mainmenu;
 static App* app = &app__mainmenu;
 
-static uint8_t chosenline = 0;
+static uint8_t top_app = 0;
+static uint8_t chosen_app = 0;
 
-#define BUF(l,c) buf[LCD_WIDTH*l+c]
+static char* appnames[] = {
+		"Debug",
+		"Tetris",
+		"Pong",
+		"Space invaders",
+		"Timer",
+		"Stopwatch",
+		"---",
+		"Hello, world",
+		"Settings",
+		"About",
+};
+
+static uint8_t appsno = sizeof(appnames) / sizeof(appnames[0]);
+
+#define BUF(l,c) buf[LCD_WIDTH*(l)+(c)]
 static void draw_handler(uint8_t* buf) {
-	BUF(chosenline,1) = 0xFF;
+	for (int i=0; i+top_app<appsno && i<LCD_PAGES; ++i) {
+		print_string(appnames[i+top_app], i, 3, buf);
+	}
+	BUF(chosen_app-top_app,1) = 0xFF;
+	print_char((char)16, chosen_app-top_app, 120, buf);
 }
 
 static void btn_pressed_handler(uint32_t btn) {
 	if (btn & BTN_MASK_UP) {
-		if (chosenline != 0) {
-			--chosenline;
-			app->needs_redraw = 1;
+		if (chosen_app == top_app) {	// pierwsza wybrana opcja
+			if (chosen_app == 0) {	// pierwsza ever -> zawin
+				chosen_app = appsno-1;
+				top_app = appsno-8;
+			}
+			else {
+				chosen_app--;
+				top_app--;
+			}
+		}
+		else {
+			chosen_app--;
 		}
 	}
+
+
 	if (btn & BTN_MASK_DOWN) {
-		if (chosenline != 7) {
-			++chosenline;
-			app->needs_redraw = 1;
+		if (chosen_app - top_app == 7) {	// ostatnia wybrana opcja
+			if (chosen_app == appsno - 1) {	// ostatnia ever -> zawin
+				chosen_app = 0;
+				top_app = 0;
+			}
+			else {
+				chosen_app++;
+				top_app++;
+			}
+		}
+		else {
+			chosen_app++;
 		}
 	}
+
 	if (btn & BTN_MASK_BACK) {
 		app_quit();
 	}
