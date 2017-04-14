@@ -141,6 +141,7 @@ static void watchface_msg(char* data) {
 	for (int dig = 0; dig<6; dig++) {
 		time[dig] = data[dig]-'0';
 	}
+	app->needs_redraw = 1;
 }
 
 static void watchfacehandler(APP_ARGS) {
