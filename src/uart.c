@@ -72,28 +72,6 @@ void uart_interrupt_init() {
 	NVIC_Init(&NVIC_InitStructure);
 }
 
-//void uart_close(USART_TypeDef* USARTx)
-//{
-//    assert_param(IS_USART_123_PERIPH(USARTx));
-//}
-
-int uart_putc(int c, USART_TypeDef* USARTx)
-{
-  assert_param(IS_USART_123_PERIPH(USARTx));
-
-  while (USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET);
-  USARTx->DR =  (c & 0xff);
-  return 0;
-}
-
-int uart_getc (USART_TypeDef* USARTx)
-{
-  assert_param(IS_USART_123_PERIPH(USARTx));
-
-  while (USART_GetFlagStatus(USARTx, USART_FLAG_RXNE) == RESET);
-  return  USARTx->DR & 0xff;
-}
-
 void uart_init() {
 	uart_open(BT_USART_PORT, BT_USART_BAUD);
 	uart_interrupt_init();

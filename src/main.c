@@ -13,7 +13,6 @@
 #include "lcd.h"
 #include "led.h"
 #include "uart.h"
-#include "dma.h"
 #include "mainloop.h"
 #include "timers.h"
 #include "btn.h"
@@ -27,7 +26,6 @@ int main(void)
 	led_on(LED_VIBR);
 	uart_init();
 	lcd_init();
-//	dma_init();
 	btn_init();
 	timers_init();
 

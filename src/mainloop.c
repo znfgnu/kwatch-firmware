@@ -8,7 +8,6 @@
 #include "mainloop.h"
 #include "led.h"
 #include "lcd.h"
-#include "dma.h"
 #include "app_mgr.h"
 #include "app_events.h"
 #include "app__serial.h"
