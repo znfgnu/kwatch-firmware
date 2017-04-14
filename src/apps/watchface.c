@@ -23,10 +23,10 @@ static App* app = &app__watchface;
 static uint8_t time[6] = {2, 3, 5, 8, 0, 0};
 static uint16_t date[3] = {15, 1, 2017};
 
-//debug
+#ifdef APP__WATCHFACE_DEBUG
 char* lastev = "Hello!";
 uint8_t btn_no = 0x0F;
-//-debug
+#endif
 
 #define BUF2(x,y) drawbuf[LCD_WIDTH*(x)+(y)]
 static void watchface_draw(uint8_t* drawbuf) {
@@ -48,7 +48,15 @@ static void watchface_draw(uint8_t* drawbuf) {
 	}
 
 	// todo: colon
+	if (time[5]&1) {
+		startcol = 8 + 2*24;
+		BUF2(2, startcol+7) = 0x03;
+		BUF2(3, startcol+7) = 0xC0;
+		BUF2(2, startcol+8) = 0x03;
+		BUF2(3, startcol+8) = 0xC0;
+	}
 
+	// date
 	startcol = 8;
 	startline = 6;
 	if (date[0] > 9) {
@@ -65,6 +73,7 @@ static void watchface_draw(uint8_t* drawbuf) {
 	startcol = 112;
 	draw_icon(icon_exclamation, startline, startcol);
 
+#ifdef APP__WATCHFACE_DEBUG
 	// seconds (debug)
 	startcol = LCD_WIDTH - 2*LCD_FONT_DEFAULT_WIDTH_TOTAL;
 	startline = 7;
@@ -78,6 +87,7 @@ static void watchface_draw(uint8_t* drawbuf) {
 	print_char('0'+btn_no, startline, startcol, drawbuf);
 	startcol+=LCD_FONT_DEFAULT_WIDTH_TOTAL*2;
 	print_string(lastev, startline, startcol, drawbuf);
+#endif
 }
 
 static void watchface_secondelapsed() {
@@ -110,9 +120,15 @@ static void watchface_secondelapsed() {
 }
 
 static void watchface_btn_pressed(uint32_t btn) {
+#ifdef APP__WATCHFACE_DEBUG
 	btn_no = btn;
 	lastev = "pressed";
 	app->needs_redraw = 1;
+#endif
+
+	if (btn & BTN_MASK_OK) {	// on released, because on held debug will appear
+		app_spawn(&app__mainmenu);
+	}
 
 	if (btn & BTN_MASK_BACK) {
 		lcd_turnon(lcd_is_on ^ 1);
@@ -123,22 +139,18 @@ static void watchface_btn_pressed(uint32_t btn) {
 }
 
 static void watchface_btn_held(uint32_t btn) {
+#ifdef APP__WATCHFACE_DEBUG
 	btn_no = btn;
 	lastev = "held";
 	app->needs_redraw = 1;
-
-	if (btn & BTN_MASK_OK) {	// on held, because on released main menu will appear
-		app_spawn(&app__serial);
-	}
+#endif
 }
 static void watchface_btn_released(uint32_t btn) {
+#ifdef APP__WATCHFACE_DEBUG
 	btn_no = btn;
 	lastev = "released";
 	app->needs_redraw = 1;
-
-	if (btn & BTN_MASK_OK) {	// on released, because on held debug will appear
-		app_spawn(&app__mainmenu);
-	}
+#endif
 }
 
 static void watchface_msg(char* data) {

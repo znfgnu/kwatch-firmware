@@ -14,4 +14,6 @@
 extern App app__watchface;
 void app__watchface_init();
 
+//#define APP__WATCHFACE_DEBUG
+
 #endif /* APPS_WATCHFACE_H_ */
