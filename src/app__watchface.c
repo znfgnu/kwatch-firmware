@@ -7,6 +7,7 @@
 
 #include "app__watchface.h"
 #include "app__serial.h"
+#include "app__mainmenu.h"
 #include "app_events.h"
 #include "lcd_watchface_font.h"
 #include "lcd_font.h"
@@ -119,22 +120,25 @@ static void watchface_btn_pressed(uint32_t btn) {
 	} else if (!lcd_is_on) {
 		lcd_turnon(1);
 	}
-
-	if (btn & BTN_MASK_OK) {
-		app_spawn(&app__serial);
-	}
-
 }
 
 static void watchface_btn_held(uint32_t btn) {
 	btn_no = btn;
 	lastev = "held";
 	app->needs_redraw = 1;
+
+	if (btn & BTN_MASK_OK) {	// on held, because on released main menu will appear
+		app_spawn(&app__serial);
+	}
 }
 static void watchface_btn_released(uint32_t btn) {
 	btn_no = btn;
 	lastev = "released";
 	app->needs_redraw = 1;
+
+	if (btn & BTN_MASK_OK) {	// on released, because on held debug will appear
+		app_spawn(&app__mainmenu);
+	}
 }
 
 static void watchface_msg(char* data) {

@@ -18,6 +18,7 @@
 #include "btn.h"
 #include "app__watchface.h"
 #include "app__serial.h"
+#include "app__mainmenu.h"
 #include "config.h"
 
 int main(void)
@@ -32,6 +33,7 @@ int main(void)
 	// initialize your apps here:
 	app__watchface_init();
 	app__serial_init();
+	app__mainmenu_init();
 
 	run();
 	// shouldn't reach here.
