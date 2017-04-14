@@ -4,7 +4,7 @@
  *  Created on: 14 kwi 2017
  *      Author: konrad
  */
-#include <apps/mainmenu.h>
+#include "apps/mainmenu.h"
 #include "app_events.h"
 #include "app_mgr.h"
 #include "lcd_font.h"
@@ -13,6 +13,7 @@
 
 #include "apps/dummy.h"
 #include "apps/serial.h"
+#include "apps/tetris.h"
 
 // Application structure
 App app__mainmenu;
@@ -36,7 +37,7 @@ static char* appnames[] = {
 
 static App* apppointers[] = {
 		&app__serial,
-		&app__dummy,
+		&app__tetris,
 		&app__dummy,
 		&app__dummy,
 		&app__dummy,
@@ -49,7 +50,7 @@ static App* apppointers[] = {
 
 static uint8_t appsno = sizeof(appnames) / sizeof(appnames[0]);
 
-#define BUF(l,c) buf[LCD_WIDTH*(l)+(c)]
+//#define BUF(l,c) buf[LCD_WIDTH*(l)+(c)]
 static void draw_handler(uint8_t* buf) {
 	for (int i=0; i+top_app<appsno && i<LCD_PAGES; ++i) {
 		print_string(appnames[i+top_app], i, 3, buf);

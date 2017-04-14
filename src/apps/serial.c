@@ -78,14 +78,14 @@ static void serial_handle_char(uint8_t c) {
 	}
 }
 
-#define BUF(x,y) drawbuf[LCD_WIDTH*x+y]
-static void serial_draw(uint8_t* drawbuf) {
+//#define BUF(x,y) drawbuf[LCD_WIDTH*x+y]
+static void serial_draw(uint8_t* buf) {
 	// draw rectangles
-	for (int i=0; i<111; ++i) drawbuf[i]=0xFF;
+	for (int i=0; i<111; ++i) buf[i]=0xFF;
 
 	for (int i=0; i<LCD_PAGES; ++i)
 		for (int j=112; j<LCD_WIDTH; ++j)
-			drawbuf[i*LCD_WIDTH+j] = 0xFF;
+			buf[i*LCD_WIDTH+j] = 0xFF;
 
 	// draw content
 	int textline = 0;

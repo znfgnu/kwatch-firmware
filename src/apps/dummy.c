@@ -15,7 +15,7 @@
 App app__dummy;
 static App* app = &app__dummy;
 
-#define BUF(l,c) buf[LCD_WIDTH*(l)+(c)]
+//#define BUF(l,c) buf[LCD_WIDTH*(l)+(c)]
 static void draw_handler(uint8_t* buf) {
 	print_string("Nothing to do here! \x02", 3, 1, buf);
 }

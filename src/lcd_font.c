@@ -268,8 +268,6 @@ const uint8_t lcd_font_default[] = {
   0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-#define BUF(l,c) (buf[LCD_WIDTH*(l)+(c)])
-
 void print_char(const char c, int line, int col, uint8_t* buf) {
 	for (int i=0; i<LCD_FONT_DEFAULT_WIDTH; i++)
 		BUF(line, col++) = lcd_font_default[LCD_FONT_DEFAULT_WIDTH*c+i];

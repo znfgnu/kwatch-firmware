@@ -40,4 +40,6 @@ void lcd_set_contrast(uint8_t);
 void lcd_update();
 void lcd_clearbuffer();
 
+#define BUF(l,c) (buf[LCD_WIDTH*(l)+(c)])
+
 #endif /* LCD_H_ */

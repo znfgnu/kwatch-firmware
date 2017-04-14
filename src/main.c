@@ -9,9 +9,11 @@
 */
 
 
-#include <apps/mainmenu.h>
-#include <apps/serial.h>
-#include <apps/watchface.h>
+#include "apps/mainmenu.h"
+#include "apps/serial.h"
+#include "apps/watchface.h"
+#include "apps/dummy.h"
+#include "apps/tetris.h"
 #include "stm32f10x.h"
 #include "lcd.h"
 #include "led.h"
@@ -35,6 +37,7 @@ int main(void)
 	app__serial_init();
 	app__mainmenu_init();
 	app__dummy_init();
+	app__tetris_init();
 
 	run();
 	// shouldn't reach here.
