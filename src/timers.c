@@ -9,12 +9,11 @@
 #include "stm32f10x_tim.h"
 #include "stm32f10x_rcc.h"
 #include "misc.h"	// nvic
-#include "led.h"
 #include "btn.h"
 
 int timer_seconds = 0;
 
-void timer_persecond_init() {
+static void timer_persecond_init() {
 	RCC_APB1PeriphClockCmd(RCC_APB1ENR_TIM2EN, ENABLE);
 
 	// for 24 MHz:
@@ -40,7 +39,7 @@ void timer_persecond_init() {
 	NVIC_Init(&nvicStructure);
 }
 
-void timer_btndebounce_init() {
+static void timer_btndebounce_init() {
 	RCC_APB1PeriphClockCmd(RCC_APB1ENR_TIM3EN, ENABLE);
 
 	// for 24 MHz:
@@ -71,6 +70,8 @@ void timers_init() {
 	timer_btndebounce_init();
 }
 
+// Interrupt handlers
+
 void TIM2_IRQHandler() {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
@@ -83,13 +84,17 @@ void TIM3_IRQHandler() {
 		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 
 		// get buttons state
-		uint8_t state = (GPIO_ReadInputData(GPIOB)>>BTN_PORT_OFFSET) & 0x0F;	// last 4 bits
-		for (int i=0; i<4; i++) {
-			btn_state[i] = ((state>>i)&1) | btn_state[i]<<1;	// push one bit
+		uint8_t state = ((GPIOB->IDR) >> BTN_PORT_OFFSET) & 0x0F; // last 4 bits
+		for (int i = 0; i < 4; i++) {
+			btn_state[i] = (btn_state[i] << 1) | ((state >> i) & 1); // push one bit
 
-			if ((btn_state[i] & 0x07) == BTN_PUSHED) btn_pushed |= (1<<i);
-			else if ((btn_state[i] & 0x07) == BTN_RELEASED) btn_released |= (1<<i);
-			if (btn_state[i] == BTN_HELD) btn_held |= (1<<i);
+			if ((btn_state[i] & 0x07) == BTN_PUSHED) {
+				btn_pushed |= (1 << i);
+			} else if ((btn_state[i] & 0x07) == BTN_RELEASED) {
+				btn_released |= (1 << i);
+			} else if (btn_state[i] == BTN_HELD) {
+				btn_held |= (1 << i);
+			}
 		}
 	}
 }

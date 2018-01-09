@@ -8,6 +8,6 @@
 #ifndef MAINLOOP_H_
 #define MAINLOOP_H_
 
-void run();
+void mainloop_run();
 
 #endif /* MAINLOOP_H_ */

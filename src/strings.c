@@ -7,7 +7,7 @@
 
 #include "strings.h"
 
-char* months[12] = {
+char* strings_months[12] = {
 		"January",
 		"February",
 		"March",

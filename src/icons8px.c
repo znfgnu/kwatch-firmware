@@ -9,10 +9,12 @@
 #include "icons8px.h"
 #include "lcd.h"
 
-uint8_t icon_exclamation[8] = { 0xFF, 0xFF, 0xFF, 0xA1,0xA1, 0xFF, 0xFF, 0xFF };
+icons8px_icon_t icon_exclamation = { 0xFF, 0xFF, 0xFF, 0xA1, 0xA1, 0xFF, 0xFF,
+		0xFF };
 
-void draw_icon(uint8_t* icon, int line, int col) {
-	for (int i=0; i<8; i++) {
-		lcd_buffer[line][col++] = *(icon++);
+void icons8px_draw_icon(icons8px_icon_t icon, int line, int col,
+		lcd_buffer_t buf) {
+	for (int i = 0; i < 8; i++) {
+		buf[line][col++] = *(icon++);
 	}
 }

@@ -8,10 +8,10 @@
 #ifndef APPS_MAINMENU_H_
 #define APPS_MAINMENU_H_
 
-#include "app_mgr.h"
+#include "app.h"
 
 #define APP__MAINMENU_ID	((uint8_t)'m')
-extern App app__mainmenu;
+extern App_t app__mainmenu;
 void app__mainmenu_init();
 
 #endif /* APPS_MAINMENU_H_ */

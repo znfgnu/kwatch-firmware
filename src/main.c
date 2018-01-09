@@ -16,17 +16,13 @@
 #include "apps/tetris.h"
 #include "stm32f10x.h"
 #include "lcd.h"
-#include "led.h"
 #include "uart.h"
 #include "mainloop.h"
 #include "timers.h"
 #include "btn.h"
 #include "config.h"
 
-int main(void)
-{
-	led_init();
-	led_on(LED_VIBR);
+int main(void) {
 	uart_init();
 	lcd_init();
 	btn_init();
@@ -39,6 +35,6 @@ int main(void)
 	app__dummy_init();
 	app__tetris_init();
 
-	run();
+	mainloop_run();
 	// shouldn't reach here.
 }

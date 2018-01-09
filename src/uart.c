@@ -12,86 +12,67 @@
 #include "uart.h"
 #include "config.h"
 
-char input_buffer[INPUT_BUFFER_SIZE];
-char* input_cursor = input_buffer;
-uint8_t buffer_ready = 0;	// 0 -> filling in progress, 1 -> reading in progress
+char uart_input_buffer[INPUT_BUFFER_SIZE];
+static char* uart_input_cursor = uart_input_buffer;
+uint8_t uart_buffer_ready = 0;	// 0 -> filling in progress, 1 -> reading in progress
 // TODO: more buffers!
 
-int uart_open (USART_TypeDef* USARTx, uint32_t baud)
-{
-  USART_InitTypeDef USART_InitStructure;
-  GPIO_InitTypeDef GPIO_InitStructureTx;
-  GPIO_InitTypeDef GPIO_InitStructureRx;
+void uart_init() {
+	/*
+	 * UART is configured on pins PA9 and PA10 of USART1 peripheral
+	 */
+	USART_InitTypeDef USART_InitStructure;
+	GPIO_InitTypeDef GPIO_InitStructureTx;
+	GPIO_InitTypeDef GPIO_InitStructureRx;
 
-  assert_param(IS_USART_123_PERIPH(USARTx));
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 
-  if (USARTx == USART1) {
+	// Configure TX pin
+	GPIO_InitStructureTx.GPIO_Pin = GPIO_Pin_9;
+	GPIO_InitStructureTx.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_InitStructureTx.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructureTx);
 
-    // Turn on clocks
+	// Configure RX pin
+	GPIO_InitStructureRx.GPIO_Pin = GPIO_Pin_10;
+	GPIO_InitStructureRx.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_Init(GPIOA, &GPIO_InitStructureRx);
 
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA  |
-			   RCC_APB2Periph_AFIO,
-			   ENABLE);
+	// Configure UART peripheral
+	USART_StructInit(&USART_InitStructure);
+	USART_InitStructure.USART_BaudRate = BT_USART_BAUD;
+	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+	USART_Init(USART1, &USART_InitStructure);
+	USART_Cmd(USART1, ENABLE);
 
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-
-    // Configure TX pin
-
-    GPIO_InitStructureTx.GPIO_Pin = GPIO_Pin_9;
-    GPIO_InitStructureTx.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_InitStructureTx.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOA, &GPIO_InitStructureTx);
-
-    // Configure RX pin
-
-    GPIO_InitStructureRx.GPIO_Pin = GPIO_Pin_10;
-    GPIO_InitStructureRx.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_Init(GPIOA, &GPIO_InitStructureRx);
-
-    // Configure the UART
-
-    USART_StructInit(&USART_InitStructure);
-    USART_InitStructure.USART_BaudRate = baud;
-    USART_InitStructure.USART_Mode  = USART_Mode_Rx | USART_Mode_Tx;
-    USART_Init(USART1,&USART_InitStructure);
-    USART_Cmd(USART1, ENABLE);
-
-    return 0;
-  }
-  return 1;
-}
-
-void uart_interrupt_init() {
+	// Configure interrupt
 	NVIC_InitTypeDef NVIC_InitStructure;
-	USART_ITConfig(BT_USART_PORT, USART_IT_RXNE, ENABLE);
+	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
 
-	NVIC_InitStructure.NVIC_IRQChannel = BT_USART_IRQN;
+	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 }
 
-void uart_init() {
-	uart_open(BT_USART_PORT, BT_USART_BAUD);
-	uart_interrupt_init();
-}
+// Interrupt handlers
 
 void USART1_IRQHandler() {
-	if( USART_GetITStatus(BT_USART_PORT, USART_IT_RXNE)) {
-		if (buffer_ready == 0) {
-			*input_cursor = BT_USART_PORT->DR;
-			if (*input_cursor == '\0') {
+	if (USART_GetITStatus(USART1, USART_IT_RXNE)) {
+		if (uart_buffer_ready == 0) {
+			*uart_input_cursor = USART1->DR;
+			if (*uart_input_cursor == '\0') {
 				// go to next buffer
-				input_cursor = input_buffer;
-				buffer_ready = 1;
+				uart_input_cursor = uart_input_buffer;
+				uart_buffer_ready = 1;
 			} else {
-				input_cursor++;
+				uart_input_cursor++;
 			}
-		}
-		else {
+		} else {
 			// error, no space for more bytes
-			USART_ClearITPendingBit(BT_USART_PORT, USART_IT_RXNE);	// reading data register clears flag
+			USART_ClearITPendingBit(USART1, USART_IT_RXNE);	// reading data register clears flag
 		}
 
 	}

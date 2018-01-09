@@ -8,10 +8,10 @@
 #ifndef APPS_SERIAL_H_
 #define APPS_SERIAL_H_
 
-#include "app_mgr.h"
+#include "app.h"
 
 #define APP__SERIAL_ID	((uint8_t)'T')
-extern App app__serial;
+extern App_t app__serial;
 void app__serial_init();
 
 #endif /* APPS_SERIAL_H_ */

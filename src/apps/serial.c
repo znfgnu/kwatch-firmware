@@ -5,16 +5,16 @@
  *      Author: konrad
  */
 
+#include <app_event.h>
 #include <apps/serial.h>
-#include "app_events.h"
-#include "app_mgr.h"
+#include "app.h"
 #include "lcd_font.h"
 #include "lcd.h"
 #include "btn.h"
 
 // Application structure
-App app__serial;
-static App* app = &app__serial;
+App_t app__serial;
+static App_t* app = &app__serial;
 
 // Private (static) data storage
 static const uint8_t total_cols = 18;
@@ -78,14 +78,13 @@ static void serial_handle_char(uint8_t c) {
 	}
 }
 
-//#define BUF(x,y) drawbuf[LCD_WIDTH*x+y]
-static void serial_draw(uint8_t* buf) {
+static void serial_draw(lcd_buffer_t buf) {
 	// draw rectangles
-	for (int i=0; i<111; ++i) buf[i]=0xFF;
+	for (int i=0; i<111; ++i) buf[0][i]=0xFF;
 
 	for (int i=0; i<LCD_PAGES; ++i)
 		for (int j=112; j<LCD_WIDTH; ++j)
-			buf[i*LCD_WIDTH+j] = 0xFF;
+			buf[i][j] = 0xFF;
 
 	// draw content
 	int textline = 0;
@@ -97,11 +96,13 @@ static void serial_draw(uint8_t* buf) {
 		lcdcol=0;
 		for (; textcol<total_cols; textcol++) {
 			int k;
-			char c = textdata[textline][textcol];
-			for (k=0; k<LCD_FONT_DEFAULT_WIDTH; k++)
-				BUF(lcdline, lcdcol++) = lcd_font_default[LCD_FONT_DEFAULT_WIDTH*c+k];
-			for (; k<LCD_FONT_DEFAULT_WIDTH_TOTAL; k++)
-				BUF(lcdline, lcdcol++) = 0x00;
+			int c = textdata[textline][textcol];
+			for (k=0; k<LCD_FONT_DEFAULT_WIDTH; k++) {
+				buf[lcdline][lcdcol++] = lcd_font_default[c][k];
+			}
+			for (; k<LCD_FONT_DEFAULT_WIDTH_TOTAL; k++) {
+				buf[lcdline][lcdcol++] = 0x00;
+			}
 		}
 	}
 }
@@ -114,7 +115,7 @@ static void serial_handle_string(char* s) {
 }
 
 static void serial_handle_msg(char* msg) {
-	serial_handle_char(CHR_BT);
+	serial_handle_char(LCD_FONT_CHR_BT);
 	serial_handle_char(' ');
 	serial_handle_string(msg);
 	serial_new_line();
@@ -139,7 +140,7 @@ static void serial_btn_pressed(uint32_t btn) {
 	serial_handle_string("'\n");
 }
 
-static void serialhandler(APP_ARGS) {
+static void serialhandler(uint32_t id, void* data) {
 	switch(id) {
 	case APP_EVENT_SPAWN:
 		app->needs_redraw = 1;
@@ -149,7 +150,7 @@ static void serialhandler(APP_ARGS) {
 		app->needs_redraw = 1;
 		break;
 	case APP_EVENT_DRAW:
-		serial_draw((uint8_t*)data);
+		serial_draw(data);
 		break;
 	case APP_EVENT_BTN_PRESSED:
 		serial_btn_pressed((uint32_t)data);

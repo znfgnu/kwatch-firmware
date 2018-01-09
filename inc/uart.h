@@ -10,8 +10,8 @@
 
 #define INPUT_BUFFER_SIZE	200
 
-extern char input_buffer[];
-extern uint8_t buffer_ready;	// 0 -> filling in progress, 1 -> reading in progress
+extern char uart_input_buffer[];
+extern uint8_t uart_buffer_ready;	// 0 -> filling in progress, 1 -> reading in progress
 
 void uart_init();
 

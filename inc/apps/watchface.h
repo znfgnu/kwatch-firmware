@@ -8,10 +8,10 @@
 #ifndef APPS_WATCHFACE_H_
 #define APPS_WATCHFACE_H_
 
-#include "app_mgr.h"
+#include "app.h"
 
 #define APP__WATCHFACE_ID	((uint8_t)'t')
-extern App app__watchface;
+extern App_t app__watchface;
 void app__watchface_init();
 
 //#define APP__WATCHFACE_DEBUG

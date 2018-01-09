@@ -10,17 +10,78 @@
 #include "stm32f10x_i2c.h"
 #include "config.h"
 
-
-// private functions
-void lcdI2CWrite(uint8_t);
-void lcdI2CStart(uint8_t);
-void lcdI2CStop();
-void lcdI2CInit();
-void lcdI2CUpdatePage(uint8_t, uint8_t*);
-void lcdI2CUpdateScreen(uint8_t*);
-
-uint8_t lcd_buffer[LCD_PAGES][LCD_WIDTH];
+lcd_buffer_t lcd_buffer;
 uint8_t lcd_is_on = 1;
+
+// Stupid - wasting CPU time for displaying data
+static void lcdI2CWrite(uint8_t data) {
+	I2C_SendData(LCD_I2C_PORT, data);
+	while (!I2C_CheckEvent(LCD_I2C_PORT, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
+}
+
+static void lcdI2CStart(uint8_t addr) {
+	// wait until not busy
+	while (I2C_GetFlagStatus(LCD_I2C_PORT, I2C_FLAG_BUSY));
+
+	// generate start
+	I2C_GenerateSTART(LCD_I2C_PORT, ENABLE);
+
+	// wait until slave acknowledged start condition
+	while (!I2C_CheckEvent(LCD_I2C_PORT, I2C_EVENT_MASTER_MODE_SELECT));
+
+	// stm is transmitter
+	I2C_Send7bitAddress(LCD_I2C_PORT, addr, I2C_Direction_Transmitter);
+	while (!I2C_CheckEvent(LCD_I2C_PORT,
+			I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));
+}
+
+static void lcdI2CStop() {
+	I2C_GenerateSTOP(LCD_I2C_PORT, ENABLE);
+}
+
+static void lcdI2CInit() {
+	GPIO_InitTypeDef GPIO_InitStruct;
+	I2C_InitTypeDef I2C_InitStruct;
+
+	RCC_APB2PeriphClockCmd(LCD_RCC_GPIO, ENABLE);
+	RCC_APB1PeriphClockCmd(LCD_RCC_I2C, ENABLE); // PB6-7 -> LCD_I2C_PORT pins pack 1
+
+	GPIO_InitStruct.GPIO_Pin = LCD_I2C_PINS;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_OD; // alternate function (I2C here)
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(LCD_GPIO_PORT, &GPIO_InitStruct);
+
+	RCC_APB1PeriphResetCmd(LCD_RCC_I2C, ENABLE);
+	RCC_APB1PeriphResetCmd(LCD_RCC_I2C, DISABLE);
+
+	I2C_InitStruct.I2C_ClockSpeed = 400000;
+	I2C_InitStruct.I2C_Mode = I2C_Mode_I2C;
+	I2C_InitStruct.I2C_DutyCycle = I2C_DutyCycle_2;
+	I2C_InitStruct.I2C_OwnAddress1 = 0x00;			// don't care when master
+	I2C_InitStruct.I2C_Ack = I2C_Ack_Disable;
+	I2C_InitStruct.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+	I2C_Init(LCD_I2C_PORT, &I2C_InitStruct);
+
+	I2C_Cmd(LCD_I2C_PORT, ENABLE);
+}
+
+static void lcdI2CUpdatePage(uint8_t page_number, lcd_page_t buffer) {
+	lcdI2CStart(LCD_I2C_ADDR);
+	lcdI2CWrite(LCD_I2C_CMD_TOKEN);
+	lcdI2CWrite(0xB0 + page_number);
+	lcdI2CWrite(0x00);
+	lcdI2CWrite(0x10);
+	lcdI2CStop();
+
+	lcdI2CStart(LCD_I2C_ADDR);
+	lcdI2CWrite(LCD_I2C_DATA_TOKEN);		// register (GDDRAM register?)
+
+	for (int i = 0; i < LCD_WIDTH; i++) {
+		lcdI2CWrite(buffer[i]);
+	}
+
+	lcdI2CStop();
+}
 
 void lcd_init() {
 	lcdI2CInit();
@@ -62,7 +123,7 @@ void lcd_init() {
 	lcdI2CWrite(0x10);
 	lcdI2CStop();
 
-	lcdI2CUpdateScreen((uint8_t*)lcd_buffer);
+	lcd_update();
 }
 
 void lcd_scroll(uint8_t lines) {
@@ -97,89 +158,15 @@ void lcd_set_contrast(uint8_t contrast) {
 }
 
 void lcd_update() {
-	lcdI2CUpdateScreen((uint8_t*)lcd_buffer);
-}
-
-void lcd_clearbuffer() {
-	for (int i=0; i<LCD_PAGES; ++i) {
-		for (int j=0; j<LCD_WIDTH; ++j) {
-			lcd_buffer[i][j] = 0x00;
-		}
+	for (int i = 0; i < LCD_PAGES; ++i) {
+		lcdI2CUpdatePage(i, lcd_buffer[i]);
 	}
 }
 
-// --- begin private functions
-
-
-// stupid. wasting CPU time for displaying data
-void lcdI2CWrite(uint8_t data) {
-	I2C_SendData(LCD_I2C_PORT, data);
-	while(!I2C_CheckEvent(LCD_I2C_PORT, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
-}
-
-void lcdI2CStart(uint8_t addr) {
-	// wait until not busy
-	while(I2C_GetFlagStatus(LCD_I2C_PORT, I2C_FLAG_BUSY));
-
-	// generate start
-	I2C_GenerateSTART(LCD_I2C_PORT, ENABLE);
-
-	// wait until slave acknowledged start condition
-	while(!I2C_CheckEvent(LCD_I2C_PORT, I2C_EVENT_MASTER_MODE_SELECT));
-
-	// stm is transmitter
-	I2C_Send7bitAddress(LCD_I2C_PORT, addr, I2C_Direction_Transmitter);
-	while(!I2C_CheckEvent(LCD_I2C_PORT, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));
-}
-
-void lcdI2CStop() {
-	I2C_GenerateSTOP(LCD_I2C_PORT, ENABLE);
-}
-
-void lcdI2CInit() {
-	GPIO_InitTypeDef GPIO_InitStruct;
-	I2C_InitTypeDef I2C_InitStruct;
-
-    RCC_APB2PeriphClockCmd(LCD_RCC_GPIO, ENABLE);
-	RCC_APB1PeriphClockCmd(LCD_RCC_I2C, ENABLE);		// PB6-7 -> LCD_I2C_PORT pins pack 1
-
-	GPIO_InitStruct.GPIO_Pin = LCD_I2C_PINS;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_OD;			// alternate function (I2C here)
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(LCD_GPIO_PORT, &GPIO_InitStruct);
-
-	RCC_APB1PeriphResetCmd(LCD_RCC_I2C, ENABLE);
-	RCC_APB1PeriphResetCmd(LCD_RCC_I2C, DISABLE);
-
-	I2C_InitStruct.I2C_ClockSpeed = 400000;
-	I2C_InitStruct.I2C_Mode = I2C_Mode_I2C;
-	I2C_InitStruct.I2C_DutyCycle = I2C_DutyCycle_2;
-	I2C_InitStruct.I2C_OwnAddress1 = 0x00;				// don't care when master
-	I2C_InitStruct.I2C_Ack = I2C_Ack_Disable;
-	I2C_InitStruct.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
-	I2C_Init(LCD_I2C_PORT, &I2C_InitStruct);
-
-	I2C_Cmd(LCD_I2C_PORT, ENABLE);
-}
-
-void lcdI2CUpdatePage(uint8_t page_number, uint8_t* buffer) {
-	lcdI2CStart(LCD_I2C_ADDR);
-	lcdI2CWrite(LCD_I2C_CMD_TOKEN);
-	lcdI2CWrite(0xB0 + page_number);
-	lcdI2CWrite(0x00);
-	lcdI2CWrite(0x10);
-	lcdI2CStop();
-
-	lcdI2CStart(LCD_I2C_ADDR);
-	lcdI2CWrite(LCD_I2C_DATA_TOKEN);		// register (GDDRAM register?)
-
-	for(int i=0; i<LCD_WIDTH; i++)
-		lcdI2CWrite(buffer[i]);
-
-	lcdI2CStop();
-}
-
-void lcdI2CUpdateScreen(uint8_t* buffer) {
-	for (int i=0; i<LCD_PAGES; ++i)
-		lcdI2CUpdatePage(i, buffer+LCD_WIDTH*i);
+void lcd_clearbuffer() {
+	for (int i = 0; i < LCD_PAGES; ++i) {
+		for (int j = 0; j < LCD_WIDTH; ++j) {
+			lcd_buffer[i][j] = 0x00;
+		}
+	}
 }

@@ -4,16 +4,15 @@
  *  Created on: 14 kwi 2017
  *      Author: konrad
  */
+#include <app.h>
+#include <app_event.h>
 #include "apps/tetris.h"
-#include "app_events.h"
-#include "app_mgr.h"
 #include "lcd_font.h"
 #include "lcd.h"
 #include "btn.h"
 
 // Application structure
-App app__tetris;
-static App* app = &app__tetris;
+App_t app__tetris;
 
 static uint16_t board[20];
 static uint8_t block[4][4] = {
@@ -30,24 +29,18 @@ static void spawn_handler(void) {
 	}
 }
 
-static void draw_handler(uint8_t* buf) {
+static void draw_handler(lcd_buffer_t buf) {
 	uint8_t l_offset = 1;
 	uint8_t c_offset = 10;
-	// draw white rectangle on whole board
-//	for (int i=0; i<5; ++i) {
-//		for (int j=0; j<80; ++j) {
-//			BUF(l_offset+i, c_offset+j) = 0xff;
-//		}
-//	}
 
 	// draw frame
 	for (int i=0; i<82; ++i) {
-		BUF(l_offset-1, c_offset-1+i) = 0x80;
-		BUF(l_offset+5, c_offset-1+i) = 0x01;
+		buf[l_offset-1][c_offset-1+i] = 0x80;
+		buf[l_offset+5][c_offset-1+i] = 0x01;
 	}
 	for (int i=0; i<5; ++i) {
-		BUF(l_offset+i, c_offset-1) = 0xFF;
-		BUF(l_offset+i, c_offset+80) = 0xFF;
+		buf[l_offset+i][c_offset-1] = 0xFF;
+		buf[l_offset+i][c_offset+80] = 0xFF;
 	}
 
 	// draw blocks
@@ -55,12 +48,12 @@ static void draw_handler(uint8_t* buf) {
 		if (board[i]) {
 			for (int j=0; j<5; j++) {
 				uint8_t wtd = (board[i]>>(j*2))&3;
-				for (int k=0; k<4; ++k) BUF(l_offset+j, c_offset+4*i+k) = block[wtd][k];
+				for (int k=0; k<4; ++k) {
+					buf[l_offset+j][c_offset+4*i+k] = block[wtd][k];
+				}
 			}
 		}
 	}
-
-
 }
 
 static void btn_pressed_handler(uint32_t btn) {
@@ -69,14 +62,14 @@ static void btn_pressed_handler(uint32_t btn) {
 	}
 }
 
-static void handler(APP_ARGS) {
+static void handler(uint32_t id, void* data) {
 	switch(id) {
 	case APP_EVENT_SPAWN:
 		spawn_handler();
-		app->needs_redraw = 1;
+		app__tetris.needs_redraw = 1;
 		break;
 	case APP_EVENT_DRAW:
-		draw_handler((uint8_t*)data);
+		draw_handler(data);
 		break;
 	case APP_EVENT_BTN_PRESSED:
 		btn_pressed_handler((uint32_t)data);
@@ -85,8 +78,7 @@ static void handler(APP_ARGS) {
 }
 
 void app__tetris_init() {
-	app_init(app, APP__TETRIS_ID, &handler,
+	app_init(&app__tetris, APP__TETRIS_ID, &handler,
 			APP_EVENT_BTN_PRESSED | APP_EVENT_SECOND_ELAPSED | APP_EVENT_DRAW,	// foreground
-			0
-			);
+			0);
 }

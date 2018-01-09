@@ -28,8 +28,10 @@
 #define LCD_CMD_DISPLAYON(x)	(0xAE|x)	// 0 - sleep mode, 1 - normal mode
 #define LCD_CMD_FREEZERAM(x)	(0xA4|x)	// 0 - normal mode, LCD follows RAM content, 1 - RAM can change, LCD stays the same
 
+typedef uint8_t lcd_page_t[LCD_WIDTH];
+typedef lcd_page_t lcd_buffer_t[LCD_PAGES];
 
-extern uint8_t lcd_buffer[LCD_PAGES][LCD_WIDTH];
+extern lcd_buffer_t lcd_buffer;
 extern uint8_t lcd_is_on;
 
 void lcd_init(void);
@@ -39,7 +41,5 @@ void lcd_turnon(uint8_t);
 void lcd_set_contrast(uint8_t);
 void lcd_update();
 void lcd_clearbuffer();
-
-#define BUF(l,c) (buf[LCD_WIDTH*(l)+(c)])
 
 #endif /* LCD_H_ */

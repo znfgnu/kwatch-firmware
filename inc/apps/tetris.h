@@ -8,10 +8,10 @@
 #ifndef APPS_TETRIS_H_
 #define APPS_TETRIS_H_
 
-#include "app_mgr.h"
+#include "app.h"
 
 #define APP__TETRIS_ID	((uint8_t)'+')
-extern App app__tetris;
+extern App_t app__tetris;
 void app__tetris_init();
 
 #endif /* APPS_TETRIS_H_ */

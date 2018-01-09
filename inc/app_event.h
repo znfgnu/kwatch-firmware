@@ -5,8 +5,8 @@
  *      Author: konrad
  */
 
-#ifndef APP_EVENTS_H_
-#define APP_EVENTS_H_
+#ifndef APP_EVENT_H_
+#define APP_EVENT_H_
 
 #define APP_EVENT_BT_MSG			0x00000001		// received msg via bluetooth
 #define APP_EVENT_SECOND_ELAPSED	0x00000002		// one second elapsed
@@ -18,5 +18,4 @@
 #define APP_EVENT_BTN_HELD			0x00000020
 #define APP_EVENT_BTN_RELEASED		0x00000040
 
-
-#endif /* APP_EVENTS_H_ */
+#endif /* APP_EVENT_H_ */

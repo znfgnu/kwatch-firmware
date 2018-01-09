@@ -8,7 +8,11 @@
 #ifndef ICONS8PX_H_
 #define ICONS8PX_H_
 
-extern uint8_t icon_exclamation[8];
-void draw_icon(uint8_t*, int, int);
+#include "lcd.h"
+
+typedef uint8_t icons8px_icon_t[8];
+
+extern icons8px_icon_t icon_exclamation;
+void icons8px_draw_icon(icons8px_icon_t, int, int, lcd_buffer_t);
 
 #endif /* ICONS8PX_H_ */
