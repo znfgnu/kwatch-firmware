@@ -14,6 +14,7 @@
 #include "apps/watchface.h"
 #include "apps/dummy.h"
 #include "apps/tetris.h"
+#include "apps/animation.h"
 #include "stm32f10x.h"
 #include "lcd.h"
 #include "uart.h"
