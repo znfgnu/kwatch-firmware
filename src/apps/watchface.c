@@ -58,6 +58,7 @@ static void watchface_draw(lcd_buffer_t drawbuf) {
 	// date
 	startcol = 8;
 	startline = 6;
+
 	if (date[0] > 9) {
 		lcd_font_print_char('0' + date[0] / 10, startline, startcol, drawbuf);
 		startcol += LCD_FONT_DEFAULT_WIDTH_TOTAL;
@@ -65,8 +66,8 @@ static void watchface_draw(lcd_buffer_t drawbuf) {
 	lcd_font_print_char('0' + date[0] % 10, startline, startcol, drawbuf);
 	startcol += LCD_FONT_DEFAULT_WIDTH_TOTAL * 2;	// plus space
 
-	lcd_font_print_string(strings_months[date[1] - 1], startline, startcol,
-			drawbuf);
+	lcd_font_print_string(strings_months_short[date[1] - 1], startline,
+			startcol, drawbuf);
 
 	// number of notifications
 	startcol = 112;

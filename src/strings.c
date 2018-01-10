@@ -7,17 +7,17 @@
 
 #include "strings.h"
 
-char* strings_months[12] = {
-		"January",
-		"February",
-		"March",
-		"April",
+char* strings_months_short[12] = {
+		"Jan",
+		"Feb",
+		"Mar",
+		"Apr",
 		"May",
-		"June",
-		"July",
-		"August",
-		"September",
-		"October",
-		"November",
-		"December"
+		"Jun",
+		"Jul",
+		"Aug",
+		"Sep",
+		"Oct",
+		"Nov",
+		"Dec"
 };
