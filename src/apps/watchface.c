@@ -172,8 +172,23 @@ static void watchface_btn_released(uint32_t btn) {
 }
 
 static void watchface_msg(char* data) {
-	for (int dig = 0; dig < 6; dig++) {
-		time[dig] = data[dig] - '0';
+	date[2] = 0;
+	for (int dig = 0; dig < 4; dig++) {
+		date[2] *= 10;
+		date[2] += data[dig] - '0';
+	}
+	date[1] = 0;
+	for (int dig = 4; dig < 6; dig++) {
+		date[1] *= 10;
+		date[1] += data[dig] - '0';
+	}
+	date[0] = 0;
+	for (int dig = 6; dig < 8; dig++) {
+		date[0] *= 10;
+		date[0] += data[dig] - '0';
+	}
+	for (int dig = 8; dig < 14; dig++) {
+		time[dig-8] = data[dig] - '0';
 	}
 	app__watchface.needs_redraw = 1;
 }
