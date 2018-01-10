@@ -16,8 +16,8 @@ typedef void (*app_handler_t)(uint32_t, void*);
 
 // Application structure. Stores data needed to communicate with firmware
 typedef struct {
-	uint8_t id;				// unique application ID
-	uint8_t needs_redraw;
+	uint32_t id;				// unique application ID
+	int needs_redraw;
 	app_handler_t handler;	// handler for events
 
 	uint32_t events_when_background;
@@ -26,7 +26,7 @@ typedef struct {
 
 extern App_t* foreground;
 
-void app_init(App_t*, uint8_t, app_handler_t, uint32_t, uint32_t);
+void app_init(App_t*, uint32_t, app_handler_t, uint32_t, uint32_t);
 void app_spawn(App_t*);
 void app_quit();
 App_t* app_get_active_app();

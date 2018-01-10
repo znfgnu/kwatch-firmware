@@ -16,7 +16,7 @@ static uint8_t number_of_apps = 0;
 static App_t* stack[APP_MAX_APPS];
 static uint8_t stack_size = 0;
 
-void app_init(App_t* app, uint8_t id, app_handler_t handler,
+void app_init(App_t* app, uint32_t id, app_handler_t handler,
 		uint32_t events_foreground, uint32_t events_background) {
 	app->id = id;
 	app->handler = handler;
