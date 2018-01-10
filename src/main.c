@@ -34,6 +34,7 @@ int main(void) {
 	app__mainmenu_init();
 	app__dummy_init();
 	app__tetris_init();
+	app__animation_init();
 
 	mainloop_run();
 	// shouldn't reach here.

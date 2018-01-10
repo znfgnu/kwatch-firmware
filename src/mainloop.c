@@ -26,8 +26,10 @@ void mainloop_run() {
 	for (;;) {
 		App_t* top_app = app_get_active_app();
 		if (top_app == foreground) {
-			__WFI();
-		} else {
+			if (!(top_app->needs_redraw)) {
+				__WFI();
+			}
+		} else {	// if new app spawned
 			foreground = top_app;
 			foreground->handler(APP_EVENT_SPAWN, (void*) 0);
 		}
