@@ -17,10 +17,19 @@ extern int btn_pushed;	// Bitmask telling which button is pushed
 extern int btn_held;	// Bitmask telling which button is held
 extern int btn_released;	// Bitmask telling which button is released
 
-#define BTN_OK		0
-#define BTN_UP		1
-#define BTN_DOWN	2
-#define BTN_BACK	3
+#define BTN_OK_PORT  GPIOB
+#define BTN_OK_PIN   GPIO_Pin_12
+#define BTN_UP_PORT  GPIOC
+#define BTN_UP_PIN   GPIO_Pin_13
+#define BTN_DOWN_PORT  GPIOC
+#define BTN_DOWN_PIN   GPIO_Pin_2
+#define BTN_BACK_PORT  GPIOB
+#define BTN_BACK_PIN   GPIO_Pin_2
+
+#define BTN_NUM_OK		0
+#define BTN_NUM_UP		1
+#define BTN_NUM_DOWN		2
+#define BTN_NUM_BACK		3
 
 #define BTN_MASK_OK		0x01
 #define BTN_MASK_UP		0x02

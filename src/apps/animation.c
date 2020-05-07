@@ -20,13 +20,17 @@ static int fps = 0;
 
 static int help_screen = 0;
 
-#define APP__ANIMATION_MAX_ELEMENTS	500
+#define APP__ANIMATION_MAX_ELEMENTS	3500
 
 static int active_elements = 3;
 static unsigned char xx[APP__ANIMATION_MAX_ELEMENTS];
 static unsigned char yy[APP__ANIMATION_MAX_ELEMENTS];
 static char dx[APP__ANIMATION_MAX_ELEMENTS];
 static char dy[APP__ANIMATION_MAX_ELEMENTS];
+
+#define XSTR(x) STR(x)
+#define STR(x) #x
+const char* ident=XSTR(HW_IDENT);
 
 static void draw_handler(lcd_buffer_t buf) {
 	if (help_screen) {
@@ -48,13 +52,17 @@ static void draw_handler(lcd_buffer_t buf) {
 		}
 	}
 
-	lcd_font_print_string("FPS:", 7, 128 - 35, buf);
-	lcd_font_print_char('0' + fps / 10, 7, 128 - 10, buf);
-	lcd_font_print_char('0' + fps % 10, 7, 128 - 5, buf);
+	lcd_font_print_string(ident, 0, 0, buf);
 
-	lcd_font_print_char('0' + active_elements / 100, 7, 0, buf);
-	lcd_font_print_char('0' + active_elements / 10 % 10, 7, 5, buf);
-	lcd_font_print_char('0' + active_elements % 10, 7, 10, buf);
+	lcd_font_print_string("FPS:", 6, 128 - 35, buf);
+	lcd_font_print_char('0' + fps / 10, 6, 128 - 10, buf);
+	lcd_font_print_char('0' + fps % 10, 6, 128 - 5, buf);
+
+	lcd_font_print_char('0' + active_elements / 10000 % 10, 7, 128-25, buf);
+	lcd_font_print_char('0' + active_elements / 1000 % 10, 7, 128-20, buf);
+	lcd_font_print_char('0' + active_elements / 100 % 10, 7, 128-15, buf);
+	lcd_font_print_char('0' + active_elements / 10 % 10, 7, 128-10, buf);
+	lcd_font_print_char('0' + active_elements % 10, 7, 128-5, buf);
 	counter++;
 }
 
@@ -84,7 +92,26 @@ static void btn_pressed_handler(uint32_t btn) {
 	}
 }
 
+static void btn_held_handler(uint32_t btn) {
+	if (btn & BTN_MASK_UP) {
+		active_elements += 10;
+		if (active_elements > APP__ANIMATION_MAX_ELEMENTS) {
+			active_elements = 0;
+		}
+	}
+	if (btn & BTN_MASK_DOWN) {
+		active_elements -= 10;
+		if (active_elements < 0) {
+			active_elements = APP__ANIMATION_MAX_ELEMENTS;
+		}
+	}
+}
+
 static void handler(uint32_t id, void* data) {
+	static uint32_t seconds = 0;
+	static const uint32_t step = 100;
+	static const uint32_t period = 5;
+
 	switch (id) {
 	case APP_EVENT_SPAWN:
 		app__animation.needs_redraw = 1;
@@ -95,11 +122,23 @@ static void handler(uint32_t id, void* data) {
 		app__animation.needs_redraw = 1;
 		break;
 	case APP_EVENT_SECOND_ELAPSED:
+		++seconds;
 		fps = counter;
 		counter = 0;
+		if (seconds % period) {
+			int newvalue = seconds / period;
+			if (newvalue > APP__ANIMATION_MAX_ELEMENTS) {
+				newvalue = 0 * step;
+				seconds = 0;
+			}
+			active_elements = newvalue * step;
+		}
 		break;
 	case APP_EVENT_BTN_PRESSED:
 		btn_pressed_handler((uint32_t) data);
+		break;
+	case APP_EVENT_BTN_HELD:
+		btn_held_handler((uint32_t) data);
 		break;
 	}
 }
@@ -113,6 +152,6 @@ void app__animation_init() {
 		dy[i] = pseudo_rand_get() % 7 - 3;	// [-3; 3]
 	}
 	app_init(&app__animation, APP__ANIMATION_ID, &handler,
-			APP_EVENT_BTN_PRESSED | APP_EVENT_DRAW | APP_EVENT_SECOND_ELAPSED,	// foreground
+			APP_EVENT_BTN_PRESSED | APP_EVENT_BTN_HELD | APP_EVENT_DRAW | APP_EVENT_SECOND_ELAPSED,	// foreground
 			0);
 }

@@ -21,7 +21,7 @@ static void timer_persecond_init() {
 	// timer overflows each 1000ms (1sec)
 
 	TIM_TimeBaseInitTypeDef timerInitStructure;
-	timerInitStructure.TIM_Prescaler = 24000;
+	timerInitStructure.TIM_Prescaler = 12000;
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	timerInitStructure.TIM_Period = 1000 - 1;	// [0, 999] -> 1000 steps
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
@@ -84,9 +84,35 @@ void TIM3_IRQHandler() {
 		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 
 		// get buttons state
-		uint8_t state = ((GPIOB->IDR) >> BTN_PORT_OFFSET) & 0x0F; // last 4 bits
+		uint16_t stateB = (GPIOB->IDR);
+		uint16_t stateC = (GPIOC->IDR);
+
 		for (int i = 0; i < 4; i++) {
-			btn_state[i] = (btn_state[i] << 1) | ((state >> i) & 1); // push one bit
+			uint8_t state;
+
+			switch (i) {
+			case BTN_NUM_OK:
+				state = stateB & BTN_OK_PIN ? 1 : 0;
+				break;
+			
+			case BTN_NUM_UP:
+				state = stateC & BTN_UP_PIN ? 1 : 0;
+				break;
+			
+			case BTN_NUM_DOWN:
+				state = stateC & BTN_DOWN_PIN ? 1 : 0;
+				break;
+			
+			case BTN_NUM_BACK:
+				state = stateB & BTN_BACK_PIN ? 1 : 0;
+				break;
+			
+			default:
+				state = 0;
+				break;
+			}
+
+			btn_state[i] = (btn_state[i] << 1) | state; // push one bit
 
 			if ((btn_state[i] & 0x07) == BTN_PUSHED) {
 				btn_pushed |= (1 << i);

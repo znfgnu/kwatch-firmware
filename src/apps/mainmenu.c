@@ -15,6 +15,7 @@
 #include "apps/serial.h"
 #include "apps/tetris.h"
 #include "apps/animation.h"
+#include "apps/freqcheck.h"
 
 // Application structure
 App_t app__mainmenu;
@@ -24,6 +25,7 @@ static uint8_t chosen_app_idx = 0;
 
 static char* menuentries_names[] = {
 		"Debug",
+		"Freqcheck",
 		"Animation demo",
 		"Tetris",
 		"Pong",
@@ -38,6 +40,7 @@ static char* menuentries_names[] = {
 
 static App_t* menuentries_pointers[] = {
 		&app__serial,
+		&app__freqcheck,
 		&app__animation,
 		&app__tetris,
 		&app__dummy,

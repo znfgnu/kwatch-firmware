@@ -15,6 +15,7 @@
 #include "apps/dummy.h"
 #include "apps/tetris.h"
 #include "apps/animation.h"
+#include "apps/freqcheck.h"
 #include "stm32f10x.h"
 #include "lcd.h"
 #include "uart.h"
@@ -36,6 +37,7 @@ int main(void) {
 	app__dummy_init();
 	app__tetris_init();
 	app__animation_init();
+	app__freqcheck_init();
 
 	mainloop_run();
 	// shouldn't reach here.
