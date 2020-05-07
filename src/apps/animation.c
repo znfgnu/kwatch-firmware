@@ -126,12 +126,12 @@ static void handler(uint32_t id, void* data) {
 		fps = counter;
 		counter = 0;
 		if (seconds % period) {
-			int newvalue = seconds / period;
+			int newvalue = seconds / period * step;
 			if (newvalue > APP__ANIMATION_MAX_ELEMENTS) {
-				newvalue = 0 * step;
+				newvalue = 0;
 				seconds = 0;
 			}
-			active_elements = newvalue * step;
+			active_elements = newvalue;
 		}
 		break;
 	case APP_EVENT_BTN_PRESSED:
